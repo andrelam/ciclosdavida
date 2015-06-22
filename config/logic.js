@@ -136,7 +136,6 @@ function calculateCycle(difference)
 exports.calcula = function (req) {
 
 	var hoje = new Date();
-	hoje.setTime(hoje.getTime() + hoje.getTimezoneOffset() * 60 * 1000);
 	hoje.setMilliseconds(0);
 	hoje.setSeconds(0);
 	hoje.setMinutes(0);
