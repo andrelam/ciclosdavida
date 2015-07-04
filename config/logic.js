@@ -1,4 +1,4 @@
-function formatDate(date)
+﻿function formatDate(date)
 {
 	var strDate = "";
 	var aux = date.getDate();
@@ -19,7 +19,7 @@ function formatSefirah(sefirah)
   
 	var sefirot=new Array(7);
 	sefirot[0]="Chesed";
-	sefirot[1]="Guevurah";
+	sefirot[1]="Gevurah";
 	sefirot[2]="Tiferet";
 	sefirot[3]="Netzah";
 	sefirot[4]="Hod";
@@ -36,14 +36,30 @@ function formatDayOfWeek(day)
 	var weekday=new Array(7);
 	weekday[0]="Domingo";
 	weekday[1]="Segunda-feira";
-	weekday[2]="Ter&ccedil;a-feira";
+	weekday[2]="Terça-feira";
 	weekday[3]="Quarta-feira";
 	weekday[4]="Quinta-feira";
 	weekday[5]="Sexta-feira";
-	weekday[6]="S&aacute;bado";
+	weekday[6]="Sábado";
 
 	return(weekday[day]);
 }
+
+
+function formatGenderOfDay(day)
+{
+	var weekday=new Array(7);
+	weekday[0]="o";
+	weekday[1]="a";
+	weekday[2]="a";
+	weekday[3]="a";
+	weekday[4]="a";
+	weekday[5]="a";
+	weekday[6]="o";
+
+	return(weekday[day]);
+}
+
 
 function dayDiff(d1, d2)
 {
@@ -65,7 +81,7 @@ function calculateCycle(difference)
 	// Ano = 343 dias
 	var ano = ((difference - (difference % 343)) / 343) + 1;
 	difference -= (ano - 1) * 343;
-	// M�s = 49 dias
+	// Mês = 49 dias
 	var mes = ((difference - (difference % 49)) / 49) + 1;
 	difference -= (mes - 1) * 49;
 	// Semana = 7 dias
@@ -118,10 +134,16 @@ function calculateCycle(difference)
 		nomeMegaCiclo: formatSefirah(megaCiclo - 1),
 		ciclo: ciclo,
 		nomeCiclo: formatSefirah(ciclo - 1),
+		quebraCiclo: (ano == 7 && mes != 1),
+		colunaCiclo: ((8 - mes) * 2),
+		proximoCiclo: formatSefirah((ciclo == 7 ? 0 : ciclo)),
 		ano: ano,
 		nomeAno: formatSefirah(ano - 1),
 		mes: mes,
 		nomeMes: formatSefirah(mes - 1),
+		quebraAno: (mes != 1),
+		colunaAno: ((8 - mes) * 2),
+		proximoAno: formatSefirah((ano == 7 ? 0 : ano)),
 		semana: semana,
 		nomeSemana: formatSefirah(semana - 1),
 		dia: dia,
@@ -159,6 +181,7 @@ exports.calcula = function (req) {
 		nome: req.nome,
 		aniversario: formatDate(dataNascimento),
 		diaDaSemana: formatDayOfWeek(dataNascimento.getDay()),
+		generoDiaDaSemana: formatGenderOfDay(dataNascimento.getDay()),
 		hoje: formatDate(hoje),
 		numeroDias: numeroDias,
 		anoAbsoluto: (( numeroDias - (numeroDias % 343) ) / 343) + 1,
