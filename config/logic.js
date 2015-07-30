@@ -155,7 +155,7 @@ function calculateCycle(difference)
 }
 
 
-exports.calcula = function (req) {
+exports.calcula = function (req, user) {
 
 	var hoje = new Date();
 	hoje.setMilliseconds(0);

@@ -23,7 +23,7 @@ mongoose.connect(config.dbUrl); // connect to our database
 // Bootstrap application settings
 require('./config/express')(app);
 
-// require('./config/passport')(passport); // pass passport for configuration
+require('./config/passport')(passport); // pass passport for configuration
 
 // required for passport
 app.use(passport.initialize());
