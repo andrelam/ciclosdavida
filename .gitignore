@@ -44,3 +44,6 @@ Temporary Items
 
 #Node Modules
 node_modules
+
+#setup.js
+config/setup.js

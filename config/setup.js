@@ -1,3 +1,4 @@
+//Initial version
 module.exports = {
 	'dbUrl': 'your-settings-here',
 	'secret': {
