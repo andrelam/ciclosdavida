@@ -10,6 +10,7 @@ var morgan = require('morgan');
 var ejs    = require('ejs');
 var flash = require('connect-flash');
 var pkg = require('../package.json');
+var config = require('./setup');
 
 var env = process.env.NODE_ENV || 'development';
 
@@ -25,7 +26,7 @@ module.exports = function (app, passport) {
   }));
 
   // Static files middleware
-  app.use(express.static(path.join(__dirname, '/public'))); //Expose /public
+  app.use(express.static(path.join(__dirname, '/../public'))); //Expose /public
 
   // Use winston on production
   var log;
@@ -70,11 +71,11 @@ module.exports = function (app, passport) {
 
   // CookieParser should be above session
   app.use(cookieParser());
-  app.use(cookieSession({ secret: 'secret' }));
+  app.use(cookieSession({ secret: config.secret }));
   app.use(session({
     resave: true,
     saveUninitialized: true,
-    secret: pkg.name
+    secret: config.secret
   }));
 
   // connect flash for flash messages - should be declared after sessions
