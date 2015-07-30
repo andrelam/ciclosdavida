@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/andrelam/ciclosdavida#readme",
   "dependencies": {
+    "bcrypt-nodejs": "0.0.3",
     "body-parser": "^1.13.1",
     "compression": "^1.5.0",
     "connect-flash": "^0.1.1",
@@ -31,8 +32,11 @@
     "express-session": "^1.11.3",
     "mercadopago": "^0.3.2",
     "method-override": "^2.3.3",
+    "mongoose": "^4.1.0",
     "morgan": "^1.6.0",
     "nodemailer": "^1.4.0",
+    "passport": "^0.2.2",
+    "passport-local": "^1.0.0",
     "winston": "^1.0.0"
   }
 }
