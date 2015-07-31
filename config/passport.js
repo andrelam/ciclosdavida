@@ -1,10 +1,12 @@
-// config/passport.js
+﻿// config/passport.js
 
 // load all the things we need
-var LocalStrategy   = require('passport-local').Strategy;
+var LocalStrategy = require('passport-local').Strategy;
 
 // load up the user model
-var User            = require('../models/user');
+var User = require('../models/user');
+
+var crypto = require('crypto');
 
 // expose this function to our app using module.exports
 module.exports = function(passport) {
@@ -71,12 +73,18 @@ module.exports = function(passport) {
 				var dataNascStr = dataNasc[2] + '/' + dataNasc[1] + '/' + dataNasc[3];
 				
 				var dataNascimento = new Date(dataNascStr);
-				newUser.dNasc    = dataNascimento;
+				newUser.dNasc      = dataNascimento;
+				newUser.resetToken = randomValueBase64(32);
+				newUser.validated  = false;
+				newUser.premium    = false;
+				newUser.superUser  = false;
+				
                 // save the user
                 newUser.save(function(err) {
                     if (err)
                         throw err;
-                    return done(null, newUser);
+					newUser.sendMail(false);
+                    return done(null, newUser, req.flash('validationMessage', 'Um email de confirmação foi enviado para ' + newUser.email));
                 });
             }
 
@@ -87,3 +95,12 @@ module.exports = function(passport) {
     }));
 
 };
+
+
+function randomValueBase64 (len) {
+	return crypto.randomBytes(Math.ceil(len * 3 / 4))
+		.toString('base64')   // convert to base64 format
+		.slice(0, len)        // return required number of characters
+		.replace(/\+/g, '0')  // replace '+' with '0'
+		.replace(/\//g, '0'); // replace '/' with '0'
+}

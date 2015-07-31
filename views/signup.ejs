@@ -77,17 +77,10 @@
 		  return false;
 		} else {
 			var datas = form.data.value.match(re);
-			var data = new Date();
-			data.setUTCFullYear(datas[3]);
-			data.setUTCMonth(datas[2] - 1);
-			data.setUTCDate(datas[1]);
-			data.setUTCHours(0);
-			data.setUTCMinutes(0);
-			data.setUTCSeconds(0);
-			data.setUTCMilliseconds(0);
+			var data = new Date(datas[3], datas[2] - 1, datas[1], 0, 0, 0, 0);
 			if (data.getUTCFullYear() == datas[3] && (data.getUTCMonth() + 1) == datas[2] && data.getUTCDate() == datas[1])
 				return true;
-			alert("Data inválida");
+			alert("Data inválida " + data);
 			form.data.focus();
 			return false;
 		}
