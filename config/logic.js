@@ -155,7 +155,7 @@ function calculateCycle(difference)
 }
 
 
-exports.calcula = function (req, user) {
+exports.calcula = function (data, nome) {
 
 	var hoje = new Date();
 	hoje.setMilliseconds(0);
@@ -165,7 +165,7 @@ exports.calcula = function (req, user) {
 
 	var re = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
 
-	var dataNasc = req.data.match(re);
+	var dataNasc = data.match(re);
 	var dataNascStr = dataNasc[2] + '/' + dataNasc[1] + '/' + dataNasc[3];
 	
 	var dataNascimento = new Date(dataNascStr);
@@ -178,7 +178,7 @@ exports.calcula = function (req, user) {
 	var numeroDias = dayDiff(dataNascimento, hoje);
 	
 	var data = {
-		nome: req.nome,
+		nome: nome,
 		aniversario: formatDate(dataNascimento),
 		diaDaSemana: formatDayOfWeek(dataNascimento.getDay()),
 		generoDiaDaSemana: formatGenderOfDay(dataNascimento.getDay()),

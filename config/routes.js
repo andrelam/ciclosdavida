@@ -1,6 +1,7 @@
 //Routes
 
 var logic = require('./logic');
+var User  = require('../models/user');
 
 module.exports = function(app, passport) {
 
@@ -20,7 +21,11 @@ module.exports = function(app, passport) {
     });
 
     // process the login form
-    // app.post('/acessar', do all our passport stuff here);
+	app.post('/acessar', passport.authenticate('local-login', {
+		successRedirect : '/mapa',
+		failureRedirect : '/acessar',
+		failureFlash    : true }
+	));
 
     // =====================================
     // SIGNUP ==============================
@@ -38,15 +43,41 @@ module.exports = function(app, passport) {
 		failureFlash : true // allow flash messages
     }));
 
+	app.get('/confirma/:token', function(req, res) {
+		User.findOne({ resetToken: req.params.token }, function(err, user) {
+			if (!user) {
+				req.flash('validationMessage', 'Token de validação inválido');
+				return res.redirect('/');
+			}
+			user.resetToken = undefined;
+			user.resetValid = undefined;
+			user.validated  = true;
+			user.save(function(err) {
+				if (err) {
+					req.flash('validationMessage', 'Erro ao validar token');
+					return res.redirect('/');
+				}
+				req.flash('validationMessage', 'Token validado com sucesso. Prossiga com o seu Login');
+				return res.redirect('/');
+			});
+		});
+	});
+		
 	
 	app.get('/mapa', isLoggedIn, function(req, res) {
-		res.render('ciclo.ejs', { message: req.flash('validationMessage'), data: logic.calcula(req.body, req.user) });
+		var data = req.user.dNasc.getUTCDate() + "/" + (req.user.dNasc.getUTCMonth()  + 1)+ "/" + req.user.dNasc.getUTCFullYear();
+		res.render('ciclo.ejs', { message: req.flash('validationMessage'), data: logic.calcula(data, req.user.nome), user: req.user });
 	});
-  
+
+	app.post('/mapa', isSuperAdmin, function(req, res) {
+		res.render('ciclo.ejs', { message: req.flash('validationMessage'), data: logic.calcula(req.body.data, req.body.nome), user: req.user });
+	});
+
+	
     // =====================================
     // LOGOUT ==============================
     // =====================================
-    app.get('/logout', function(req, res) {
+    app.get('/sair', function(req, res) {
         req.logout();
         res.redirect('/');
     });
@@ -67,4 +98,17 @@ function isLoggedIn(req, res, next) {
 
     // if they aren't redirect them to the home page
     res.redirect('/');
+}
+
+// route middleware to make sure a user is logged in
+function isSuperAdmin(req, res, next) {
+
+    // if user is authenticated in the session, carry on 
+    if (!req.isAuthenticated()) {
+		res.redirect('/');
+	} else {
+		if (req.user.superUser)
+			return next();
+		res.redirect('/mapa');
+	}
 }
