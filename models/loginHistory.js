@@ -16,10 +16,8 @@ loginhistorySchema.methods.newLogin = function(user, success) {
 	this.loginDate = Date.now();
 	this.success   = success;
 	this.save(function(err) {
-		if (err) {
-			console.log(err);
+		if (err)
 			throw err;
-		}
 	});
 	return;
 };
