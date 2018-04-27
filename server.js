@@ -15,7 +15,7 @@ var passport = require('passport');
 
 var config = require('./config/setup.js');
 
-var port = process.env.PORT || 3000;
+var port = process.env.PORT || 2000;
 
 // configuration ===============================================================
 mongoose.connect(config.dbUrl); // connect to our database
