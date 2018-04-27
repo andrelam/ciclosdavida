@@ -118,6 +118,16 @@ module.exports = function(passport) {
             if (!user.validPassword(password))
                 return done(null, false, req.flash('loginMessage', 'Usuário ou senha inválidos.')); // create the loginMessage and save it to session as flashdata
 
+			// update last login data
+			user.resetToken = undefined;
+			user.resetValid = undefined;
+			user.lastLogin = Date.now();
+
+			user.save(function(err) {
+				if (err)
+					throw err;
+			});
+			
             // all is well, return successful user
             return done(null, user);
         });

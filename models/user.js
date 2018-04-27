@@ -11,15 +11,16 @@ var templReset = path.resolve(__dirname, '../views/mail', 'reset');
 var config     = require('../config/setup.js');
 
 var userSchema = mongoose.Schema( {
-	email     : { type: String, required: true, unique: true },
+	email     : { type: String, required: true, unique: true, trim: true },
 	password  : { type: String, required: true },
-	nome      : { type: String, required: true },
+	nome      : { type: String, required: true, trim: true },
 	dNasc     : { type: Date, required: true },
 	resetToken: { type: String, required: false },
 	resetValid: { type: Date, required: false },
 	validated : { type: Boolean, default: false },
 	premium   : { type: Boolean, default: false },
-	superUser : { type: Boolean, default: false }
+	superUser : { type: Boolean, default: false },
+	lastLogin : { type: Date, required: false }
 });
 
 // methods ======================
