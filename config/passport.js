@@ -5,6 +5,7 @@ var LocalStrategy = require('passport-local').Strategy;
 
 // load up the user model
 var User = require('../models/user');
+var LoginHistory = require('../models/loginHistory');
 
 var crypto = require('crypto');
 
@@ -61,7 +62,7 @@ module.exports = function(passport) {
 
                 // if there is no user with that email
                 // create the user
-                var newUser            = new User();
+                var newUser      = new User();
 
                 // set the user's local credentials
                 newUser.email    = email;
@@ -114,9 +115,13 @@ module.exports = function(passport) {
             if (!user)
                 return done(null, false, req.flash('loginMessage', 'Usuário ou senha inválidos.')); // req.flash is the way to set flashdata using connect-flash
 
+			var loginHistory = new LoginHistory();
+
             // if the user is found but the password is wrong
-            if (!user.validPassword(password))
+            if (!user.validPassword(password)) {
+				loginHistory.newLogin(user, false);
                 return done(null, false, req.flash('loginMessage', 'Usuário ou senha inválidos.')); // create the loginMessage and save it to session as flashdata
+			}
 
 			// update last login data
 			user.resetToken = undefined;
@@ -127,6 +132,8 @@ module.exports = function(passport) {
 				if (err)
 					throw err;
 			});
+
+			loginHistory.newLogin(user, true);
 			
             // all is well, return successful user
             return done(null, user);
