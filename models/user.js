@@ -15,8 +15,8 @@ var userSchema = mongoose.Schema( {
 	password  : { type: String, required: true },
 	nome      : { type: String, required: true },
 	dNasc     : { type: Date, required: true },
-	resetToken: String,
-	resetValid: Date,
+	resetToken: { type: String, required: false },
+	resetValid: { type: Date, required: false },
 	validated : { type: Boolean, default: false },
 	premium   : { type: Boolean, default: false },
 	superUser : { type: Boolean, default: false }
