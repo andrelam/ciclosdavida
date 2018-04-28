@@ -12,6 +12,7 @@ var express = require('express');
 var app = express();
 var mongoose = require('mongoose');
 var passport = require('passport');
+var mercadopago = require('mercadopago');
 
 var config = require('./config/setup.js');
 
@@ -19,6 +20,8 @@ var port = process.env.PORT || 2000;
 
 // configuration ===============================================================
 mongoose.connect(config.dbUrl); // connect to our database
+
+mercadopago.configure(config.mercadopago);
 
 // Bootstrap application settings
 require('./config/express')(app);
