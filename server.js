@@ -21,7 +21,7 @@ var port = process.env.PORT || 2000;
 // configuration ===============================================================
 mongoose.connect(config.dbUrl); // connect to our database
 
-mercadopago.configure(config.mercadopago);
+//mercadopago.configure(config.mercadopago);
 
 // Bootstrap application settings
 require('./config/express')(app);
