@@ -3,6 +3,7 @@
 var logic  = require('./logic');
 var User   = require('../models/user');
 var crypto = require('crypto');
+//var async  = require('async');
 
 module.exports = function(app, passport) {
 
@@ -48,6 +49,26 @@ module.exports = function(app, passport) {
 		failureRedirect : '/registro', // redirect back to the signup page if there is an error
 		failureFlash : true // allow flash messages
     }));
+
+	app.get('/contato', function(req, res) {
+		if (!req.isAuthenticated()) {
+			res.redirect('/');
+		} else {
+			if (req.user.validated) {
+				res.render('contact.ejs', { message: req.flash('contactMessage'), user: req.user });
+			} else {
+				req.flash('validationMessage', 'Você precisa logar para utilizar esta funcionalidade!');
+				res.redirect('/');
+			}
+		}
+	});
+
+	app.post('/contato', function(req, res, next) {
+		var data = req.user.dNasc.getUTCDate() + "/" + (req.user.dNasc.getUTCMonth()  + 1)+ "/" + req.user.dNasc.getUTCFullYear();
+		logic.sendMessage(req.user.nome, req.user.email, data, req.body.message);
+		req.flash('contactMessage', 'Mensagem enviada');
+		res.redirect('/mapa');
+    });
 
 	app.get('/esqueci', function(req, res) {
 		res.render('forgot.ejs', { message: req.flash('forgotMessage') });
@@ -129,7 +150,6 @@ module.exports = function(app, passport) {
 		});
 	});
 
-		
 	app.get('/mapa', isLoggedIn, function(req, res) {
 		var data = req.user.dNasc.getUTCDate() + "/" + (req.user.dNasc.getUTCMonth()  + 1)+ "/" + req.user.dNasc.getUTCFullYear();
 		res.render('ciclo.ejs', { message: req.flash('validationMessage'), data: logic.calcula(data, req.user.nome), user: req.user });

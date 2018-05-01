@@ -1,4 +1,11 @@
-﻿function formatDate(date)
+﻿var nodemailer = require('nodemailer');
+var emailTempl = require('email-templates').EmailTemplate;
+var path       = require('path');
+var templMess  = path.resolve(__dirname, '../views/mail', 'message');
+var config     = require('../config/setup.js');
+
+
+function formatDate(date)
 {
 	var strDate = "";
 	var aux = date.getDate();
@@ -191,3 +198,43 @@ exports.calcula = function (data, nome) {
 	return data;
 	
 };
+
+
+exports.sendMessage = function (nome, email, data, message) {
+	var smtp = nodemailer.createTransport(config.nodemailer.transport);
+
+	var template = new emailTempl(templMess);
+	var titulo = "Contato";
+
+	var html;
+
+	var dados = { nome: nome,
+				  email: email,
+				  dNasc: data,
+				  message: message };
+	
+	template.render(dados, function(err, result) {
+		if (err) {
+			console.log(err);
+			return;
+		}
+
+		html = result.html;
+
+		var mailOptions = {
+			to     : config.nodemailer.defaultFrom,
+			from   : config.nodemailer.defaultFrom,
+			replyTo: email,
+			subject: titulo,
+			html   : html
+		};
+		smtp.sendMail(mailOptions, function(err) {
+			if (err)
+				console.log(err);
+		});
+		return;
+	});
+
+	return;
+
+}
