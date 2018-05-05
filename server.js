@@ -21,6 +21,24 @@ var port = process.env.PORT || 2000;
 // configuration ===============================================================
 mongoose.connect(config.dbUrl); // connect to our database
 
+mongoose.Promise = global.Promise;
+
+var db = mongoose.connection;
+
+const connectWithRetry = () => {
+	console.log('MongoDB connection with retry');
+	return mongoose.connect(config.dbUrl);
+};
+
+db.on('error', err => {
+	console.log('MongoDB connection error: ${err}');
+	setTimeout(connectWithRetry, 1000);
+});
+
+db.on('connected', () => {
+	console.log('MongoDB connected');
+});
+
 //mercadopago.configure(config.mercadopago);
 
 // Bootstrap application settings

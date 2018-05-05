@@ -4,7 +4,7 @@ var mongoose = require('mongoose');
 var bcrypt   = require('bcrypt-nodejs');
 
 var nodemailer = require('nodemailer');
-var emailTempl = require('email-templates').EmailTemplate;
+var emailTempl = require('email-templates');
 var path       = require('path');
 var templConf  = path.resolve(__dirname, '../views/mail', 'confirm');
 var templReset = path.resolve(__dirname, '../views/mail', 'reset');
@@ -41,24 +41,29 @@ userSchema.methods.sendMail = function(reset) {
 	var titulo;
 
 	if (reset) {
-		template = new emailTempl(templReset);
+		template = 'reset';
 		titulo = 'Reinicialize sua senha';
 	} else {
-		template = new emailTempl(templConf);
+		template = 'confirm';
 		titulo = 'Confirme seu registro';
-	}
+	};
 
 	var html;
 
 	var user = this;
-	
-	template.render(user, function(err, result) {
-		if (err) {
-			console.log(err);
-			return;
-		}
 
-		html = result.html;
+	var email = new emailTempl( 
+		{ views: {
+			root: path.resolve(__dirname, '../views/mail'),
+			options: {
+				extension: 'ejs'
+			}
+		}
+	});
+	
+	email
+	.render(template, user)
+	.then(html => {
 
 		var mailOptions = {
 			to     : user.email,
@@ -71,7 +76,8 @@ userSchema.methods.sendMail = function(reset) {
 				console.log(err);
 		});
 		return;
-	});
+	})
+	.catch(console.error);
 
 	return;
 };

@@ -85,7 +85,7 @@ module.exports = function(passport) {
                     if (err)
                         throw err;
 					newUser.sendMail(false);
-                    return done(null, newUser, req.flash('validationMessage', 'Um email de confirmação foi enviado para ' + newUser.email));
+                    return done(null, false, req.flash('validationMessage', 'Um email de confirmação foi enviado para ' + newUser.email));
                 });
             }
 
@@ -116,7 +116,7 @@ module.exports = function(passport) {
                 return done(null, false, req.flash('loginMessage', 'Usuário ou senha inválidos.')); // req.flash is the way to set flashdata using connect-flash
 
 			var loginHistory = new LoginHistory();
-
+			
             // if the user is found but the password is wrong
             if (!user.validPassword(password)) {
 				loginHistory.newLogin(user, false);
@@ -130,7 +130,7 @@ module.exports = function(passport) {
 
 			user.save(function(err) {
 				if (err)
-					throw err;
+					return done(null, false, req.flash('loginMessage', 'Usuário ou senha inválidos.')); // create the loginMessage and save it to session as flashdata
 			});
 
 			loginHistory.newLogin(user, true);
