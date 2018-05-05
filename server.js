@@ -19,9 +19,13 @@ var config = require('./config/setup.js');
 var port = process.env.PORT || 2000;
 
 // configuration ===============================================================
-mongoose.connect(config.dbUrl); // connect to our database
-
 mongoose.Promise = global.Promise;
+mongoose.connect(config.dbUrl)
+.then(() => {
+	console.log('MongoDB connected');
+}).catch((err) => {
+	console.log('MongoDB connection error: ', err);
+}); // connect to our database
 
 var db = mongoose.connection;
 
@@ -31,9 +35,10 @@ const connectWithRetry = () => {
 };
 
 db.on('error', err => {
-	console.log('MongoDB connection error: ${err}');
+	console.log('MongoDB connection error: ', err);
 	setTimeout(connectWithRetry, 1000);
 });
+
 
 db.on('connected', () => {
 	console.log('MongoDB connected');

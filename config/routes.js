@@ -3,7 +3,6 @@
 var logic  = require('./logic');
 var User   = require('../models/user');
 var crypto = require('crypto');
-//var async  = require('async');
 
 module.exports = function(app, passport) {
 
@@ -168,6 +167,7 @@ module.exports = function(app, passport) {
         res.redirect('/');
     });
 
+	app.get('/favicon.ico', (req, res) => res.sendStatus(204));
 	
 	app.get('*', function(req, res) {
 		if (req.isAuthenticated()) {

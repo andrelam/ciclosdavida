@@ -1,5 +1,5 @@
 ﻿var nodemailer = require('nodemailer');
-var emailTempl = require('email-templates').EmailTemplate;
+var emailTempl = require('email-templates');
 var path       = require('path');
 var templMess  = path.resolve(__dirname, '../views/mail', 'message');
 var config     = require('../config/setup.js');
@@ -203,24 +203,28 @@ exports.calcula = function (data, nome) {
 exports.sendMessage = function (nome, email, data, message) {
 	var smtp = nodemailer.createTransport(config.nodemailer.transport);
 
-	var template = new emailTempl(templMess);
+	var template = 'message';
 	var titulo = "Contato";
 
 	var html;
+
+	var email = new emailTempl( 
+		{ views: {
+			root: path.resolve(__dirname, '../views/mail'),
+			options: {
+				extension: 'ejs'
+			}
+		}
+	});
 
 	var dados = { nome: nome,
 				  email: email,
 				  dNasc: data,
 				  message: message };
-	
-	template.render(dados, function(err, result) {
-		if (err) {
-			console.log(err);
-			return;
-		}
 
-		html = result.html;
-
+	email
+	.render(template, dados)
+	.then(html => {
 		var mailOptions = {
 			to     : config.nodemailer.defaultFrom,
 			from   : config.nodemailer.defaultFrom,
@@ -233,7 +237,8 @@ exports.sendMessage = function (nome, email, data, message) {
 				console.log(err);
 		});
 		return;
-	});
+	})
+	.catch(console.error);
 
 	return;
 
