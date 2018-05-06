@@ -1,8 +1,9 @@
 //Routes
 
-var logic  = require('./logic');
-var User   = require('../models/user');
-var crypto = require('crypto');
+var logic        = require('./logic');
+var User         = require('../models/user');
+var Notification = require('../models/notification');
+var crypto       = require('crypto');
 
 module.exports = function(app, passport) {
 
@@ -63,10 +64,10 @@ module.exports = function(app, passport) {
 	});
 
 	app.post('/contato', function(req, res, next) {
-		var data = req.user.dNasc.getUTCDate() + "/" + (req.user.dNasc.getUTCMonth()  + 1)+ "/" + req.user.dNasc.getUTCFullYear();
-		logic.sendMessage(req.user.nome, req.user.email, data, req.body.message);
-		req.flash('contactMessage', 'Mensagem enviada');
-		res.redirect('/mapa');
+		var notification = new Notification();
+		notification.newNotification(req.user, req.body.message);
+		req.flash('contactMessage', 'Mensagem enviada. Clique em voltar para retornar ao mapa.');
+		return res.redirect('/contato');
     });
 
 	app.get('/esqueci', function(req, res) {
@@ -151,11 +152,23 @@ module.exports = function(app, passport) {
 
 	app.get('/mapa', isLoggedIn, function(req, res) {
 		var data = req.user.dNasc.getUTCDate() + "/" + (req.user.dNasc.getUTCMonth()  + 1)+ "/" + req.user.dNasc.getUTCFullYear();
-		res.render('ciclo.ejs', { message: req.flash('validationMessage'), data: logic.calcula(data, req.user.nome), user: req.user });
+		if (req.user.superUser) {
+			Notification.count({ replied: false }, function(err, conta) {
+				if (err)
+					res.render('ciclo.ejs', { message: req.flash('validationMessage'), data: logic.calcula(data, req.user.nome), user: req.user, notification: 0 });
+				res.render('ciclo.ejs', { message: req.flash('validationMessage'), data: logic.calcula(data, req.user.nome), user: req.user, notification: conta });
+			});
+		} else {
+			res.render('ciclo.ejs', { message: req.flash('validationMessage'), data: logic.calcula(data, req.user.nome), user: req.user, notification: 0 });
+		}
 	});
 
 	app.post('/mapa', isSuperAdmin, function(req, res) {
-		res.render('ciclo.ejs', { message: req.flash('validationMessage'), data: logic.calcula(req.body.data, req.body.nome), user: req.user });
+		Notification.count({ replied: false }, function(err, conta) {
+			if (err)
+				res.render('ciclo.ejs', { message: req.flash('validationMessage'), data: logic.calcula(req.body.data, req.body.nome), user: req.user, notification: 0 });
+			res.render('ciclo.ejs', { message: req.flash('validationMessage'), data: logic.calcula(req.body.data, req.body.nome), user: req.user, notification: conta });
+		});
 	});
 
 	

@@ -1,8 +1,6 @@
 // models/loginHistory.js
 // load the things we need
 var mongoose = require('mongoose');
-var path     = require('path');
-var config   = require('../config/setup.js');
 var Schema   = mongoose.Schema;
 
 var loginhistorySchema = mongoose.Schema( {

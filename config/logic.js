@@ -1,11 +1,4 @@
-﻿var nodemailer = require('nodemailer');
-var emailTempl = require('email-templates');
-var path       = require('path');
-var templMess  = path.resolve(__dirname, '../views/mail', 'message');
-var config     = require('../config/setup.js');
-
-
-function formatDate(date)
+﻿function formatDate(date)
 {
 	var strDate = "";
 	var aux = date.getDate();
@@ -199,47 +192,3 @@ exports.calcula = function (data, nome) {
 	
 };
 
-
-exports.sendMessage = function (nome, email, data, message) {
-	var smtp = nodemailer.createTransport(config.nodemailer.transport);
-
-	var template = 'message';
-	var titulo = "Contato";
-
-	var html;
-
-	var email = new emailTempl( 
-		{ views: {
-			root: path.resolve(__dirname, '../views/mail'),
-			options: {
-				extension: 'ejs'
-			}
-		}
-	});
-
-	var dados = { nome: nome,
-				  email: email,
-				  dNasc: data,
-				  message: message };
-
-	email
-	.render(template, dados)
-	.then(html => {
-		var mailOptions = {
-			to     : config.nodemailer.defaultFrom,
-			from   : config.nodemailer.defaultFrom,
-			replyTo: email,
-			subject: titulo,
-			html   : html
-		};
-		smtp.sendMail(mailOptions, function(err) {
-			if (err)
-				console.log(err);
-		});
-		return;
-	})
-	.catch(console.error);
-
-	return;
-
-}

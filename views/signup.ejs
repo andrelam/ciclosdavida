@@ -12,7 +12,7 @@
 	<div class="container">
 		<div class="col-sm-8 col-sm-offset-2">
 			<% if (message.length > 0) { %>
-				<div class="alert alert-danger"><%= message %></div>
+				<div class="alert alert-success alert-dismissible fade-in" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Fechar"><span aria-hidden="true">&times;</span></button><%= message %></div>
 			<% } %>
 			<h1>Fa&ccedil;a seu cadastro!</h1>
 			<p>Informe os dados abaixo corretamente para obter acesso ao seu mapa dos Ciclos da Vida.</p>
