@@ -1,5 +1,4 @@
 <!-- views/index.ejs -->
-
 <!DOCTYPE html>
 <html lang="pt">
 <head>
@@ -8,6 +7,10 @@
 <body>
 
     <% include header.ejs %>
+
+	<script>
+	gtag('set', {'user_id': '<%= user._id %>'}); // Set the user ID using signed-in user_id.
+	</script>
 
 	<div class="container">
 		<div class="col-sm-8 col-sm-offset-2">
@@ -29,11 +32,8 @@
 		</div>
 
 	</div>
-	
+
 	<% include footer.ejs %>
 
 </body>
 </html>
-
-
-	
