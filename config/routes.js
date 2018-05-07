@@ -4,6 +4,7 @@ var logic        = require('./logic');
 var User         = require('../models/user');
 var Notification = require('../models/notification');
 var crypto       = require('crypto');
+var logger       = require('./logger');
 
 module.exports = function(app, passport) {
 
@@ -22,9 +23,8 @@ module.exports = function(app, passport) {
     // =====================================
     // show the login form
     app.get('/acessar', function(req, res) {
-
         // render the page and pass in any flash data if it exists
-        res.render('login.ejs', { message: req.flash('loginMessage'), user: req.user }); 
+        res.render('login.ejs', { message: req.flash('loginMessage'), user: req.user, _csrf: req.csrfToken() }); 
     });
 
     // process the login form
@@ -41,7 +41,7 @@ module.exports = function(app, passport) {
     app.get('/registro', function(req, res) {
 
         // render the page and pass in any flash data if it exists
-        res.render('signup.ejs', { message: req.flash('signupMessage') });
+        res.render('signup.ejs', { message: req.flash('signupMessage'), _csrf: req.csrfToken() });
     });
 
 	app.post('/registro', passport.authenticate('local-signup', {
@@ -55,8 +55,9 @@ module.exports = function(app, passport) {
 			res.redirect('/');
 		} else {
 			if (req.user.validated) {
-				res.render('contact.ejs', { message: req.flash('contactMessage'), user: req.user });
+				res.render('contact.ejs', { message: req.flash('contactMessage'), user: req.user, _csrf: req.csrfToken() });
 			} else {
+				logger.info('RGC-User ' + req.user.email + ' is not validated. Redirecting to /.');
 				req.flash('validationMessage', 'Você precisa logar para utilizar esta funcionalidade!');
 				res.redirect('/');
 			}
@@ -64,6 +65,8 @@ module.exports = function(app, passport) {
 	});
 
 	app.post('/contato', function(req, res, next) {
+		logger.info('RPC-Message sent from ' + req.user.email);
+		logger.verbose('RPC-Message content: ' + req.body.message);
 		var notification = new Notification();
 		notification.newNotification(req.user, req.body.message);
 		req.flash('contactMessage', 'Mensagem enviada. Clique em voltar para retornar ao mapa.');
@@ -71,20 +74,30 @@ module.exports = function(app, passport) {
     });
 
 	app.get('/esqueci', function(req, res) {
-		res.render('forgot.ejs', { message: req.flash('forgotMessage') });
+		res.render('forgot.ejs', { message: req.flash('forgotMessage'), _csrf: req.csrfToken() });
 	});
 
 	app.post('/esqueci', function(req, res, next) {
 		User.findOne({ email: req.body.email }, function(err, user) {
+			if (err) {
+				logger.error('RPE-Error while searching user ' + req.body.email + ': ' + err);
+				req.flash('forgotMessage', 'Erro interno ao buscar Email');
+				return res.redirect('/esqueci');
+			}
 			if (!user) {
+				logger.info('RPE-User not found: ' + req.body.email);
 				req.flash('forgotMessage', 'Email não cadastrado');
 				return res.redirect('/esqueci');
 			}
 			user.resetToken = randomValueBase64(32);
 			user.resetValid = Date.now() + 3600000;
 			user.save(function(err) {
-				if (err)
-					throw err;
+				if (err) {
+					logger.error('RPE-Error while saving user ' + user.email + ': ' + err);
+					req.flash('forgotMessage', 'Erro interno ao definir novo token. Favor entrar em contato com ciclosdavida@coldfire.com.br');
+					return res.redirect('/esqueci');
+				}
+				logger.info('RPE-Defined new reset token for user ' + user.email);
 				user.sendMail(true);
 				req.flash('forgotMessage', 'Um email de confirmação foi enviado para ' + user.email);
 				return res.redirect('/esqueci');
@@ -94,25 +107,35 @@ module.exports = function(app, passport) {
 	
 	app.get('/confirma/:token', function(req, res) {
 		User.findOne({ resetToken: req.params.token }, function(err, user) {
+			if (err) {
+				logger.error('RGCT-Error while searching token ' + req.params.token + ': ' + err);
+				req.flash('validationMessage', 'Erro ao localizar Token de validação. Favor entrar em contato com ciclosdavida@coldfire.com.br');
+				return res.redirect('/');
+			}
 			if (!user) {
+				logger.info('RGCT-Token not found: ' + req.params.token);
 				req.flash('validationMessage', 'Token de validação inválido');
 				return res.redirect('/');
 			}
 			if (user.validated) { // user was already validated. Password reset requested
+				logger.verbose('RGCT-User ' + user.email + ' already validated. Forwarding to password reset form');
 				if (user.resetValid < Date.now()) {
+					logger.warn('RGCT-User ' + user.email + ' using expired token ' + user.resetToken);
 					req.flash('validationMessage', 'Token para reset da senha expirado');
 					return res.redirect('/');
 				}
-				res.render('reset.ejs', { message: req.flash('validationMessage'), user: req.user, token: user.resetToken });
+				res.render('reset.ejs', { message: req.flash('validationMessage'), user: req.user, token: user.resetToken, _csrf: req.csrfToken() });
 			} else { // New user
 				user.resetToken = undefined;
 				user.resetValid = undefined;
 				user.validated  = true;
 				user.save(function(err) {
 					if (err) {
-						req.flash('validationMessage', 'Erro ao validar token');
+						logger.error('RGCT-Error while validating ' + req.params.token + ' for user ' + user.email + ': ' + err);
+						req.flash('validationMessage', 'Erro interno ao validar token. Favor entrar em contato com ciclosdavida@coldfire.com.br');
 						return res.redirect('/');
 					}
+					logger.info('RGCT-Token ' + req.params.token + ' validated for user ' + user.email);
 					req.flash('validationMessage', 'Token validado com sucesso. Prossiga com o seu Login');
 					return res.redirect('/');
 				});
@@ -123,14 +146,17 @@ module.exports = function(app, passport) {
 	app.post('/redefinir/:token', function(req, res) {
 		User.findOne({ resetToken: req.params.token, resetValid: { $gt: Date.now() } }, function(err, user) {
 			if (err) {
+				logger.error('RPRT-Error while searching token ' + req.params.token + ': ' + err);
 				req.flash('validationMessage', 'Token de redefinição de senha inválido ou expirado');
 				return res.redirect('/');
 			}
 			if (!user) {
+				logger.warn('RPRT-Token ' + req.params.token + ' within validity date not found');
 				req.flash('validationMessage', 'Token de redefinição de senha inválido ou expirado');
 				return res.redirect('/');
 			}
 			if (!user.validated) { // user was already validated. Password reset requested
+				logger.verbose('RPRT-User ' + user.email + ' is not validated. Cannot reset password');
 				req.flash('validationMessage', 'Reset da senha para novo usuário não permitido');
 				return res.redirect('/');
 			}
@@ -140,10 +166,12 @@ module.exports = function(app, passport) {
 			user.validated  = false;
 			user.save(function(err) {
 				if (err) {
-					req.flash('validationMessage', 'Erro ao validar token');
+					logger.error('RPRT-Error while saving user ' + user.email + ': ' + err);
+					req.flash('validationMessage', 'Erro interno ao validar token. Favor entrar em contato com ciclosdavida@coldfire.com.br');
 					return res.redirect('/');
 				}
 				user.sendMail(false);
+				logger.info('RPR-Password reset for user ' + user.email);
 				req.flash('validationMessage', 'Senha resetada. Um email de confirmação foi enviado.');
 				return res.redirect('/');
 			});
@@ -154,20 +182,26 @@ module.exports = function(app, passport) {
 		var data = req.user.dNasc.getUTCDate() + "/" + (req.user.dNasc.getUTCMonth()  + 1)+ "/" + req.user.dNasc.getUTCFullYear();
 		if (req.user.superUser) {
 			Notification.count({ replied: false }, function(err, conta) {
-				if (err)
-					res.render('ciclo.ejs', { message: req.flash('validationMessage'), data: logic.calcula(data, req.user.nome), user: req.user, notification: 0 });
-				res.render('ciclo.ejs', { message: req.flash('validationMessage'), data: logic.calcula(data, req.user.nome), user: req.user, notification: conta });
+				if (err) {
+					logger.error('RGM-Error while counting notifications: ' + err);
+					res.render('ciclo.ejs', { message: req.flash('validationMessage'), data: logic.calcula(data, req.user.nome), user: req.user, notification: 0, _csrf: req.csrfToken() });
+				} else {
+					res.render('ciclo.ejs', { message: req.flash('validationMessage'), data: logic.calcula(data, req.user.nome), user: req.user, notification: conta, _csrf: req.csrfToken() });
+				}
 			});
 		} else {
-			res.render('ciclo.ejs', { message: req.flash('validationMessage'), data: logic.calcula(data, req.user.nome), user: req.user, notification: 0 });
+			res.render('ciclo.ejs', { message: req.flash('validationMessage'), data: logic.calcula(data, req.user.nome), user: req.user, notification: 0, _csrf: req.csrfToken() });
 		}
 	});
 
 	app.post('/mapa', isSuperAdmin, function(req, res) {
 		Notification.count({ replied: false }, function(err, conta) {
-			if (err)
-				res.render('ciclo.ejs', { message: req.flash('validationMessage'), data: logic.calcula(req.body.data, req.body.nome), user: req.user, notification: 0 });
-			res.render('ciclo.ejs', { message: req.flash('validationMessage'), data: logic.calcula(req.body.data, req.body.nome), user: req.user, notification: conta });
+			if (err) {
+				logger.error('RGM-Error while counting notifications: ' + err);
+				res.render('ciclo.ejs', { message: req.flash('validationMessage'), data: logic.calcula(req.body.data, req.body.nome), user: req.user, notification: 0, _csrf: req.csrfToken() });
+			} else {
+				res.render('ciclo.ejs', { message: req.flash('validationMessage'), data: logic.calcula(req.body.data, req.body.nome), user: req.user, notification: conta, _csrf: req.csrfToken() });
+			}
 		});
 	});
 
@@ -180,7 +214,7 @@ module.exports = function(app, passport) {
         res.redirect('/');
     });
 
-	app.get('/favicon.ico', (req, res) => res.sendStatus(204));
+/*	app.get('/favicon.ico', (req, res) => res.sendStatus(204));  // replaced by serve-favicon */
 	
 	app.get('*', function(req, res) {
 		if (req.isAuthenticated()) {

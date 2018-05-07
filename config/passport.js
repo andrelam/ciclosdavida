@@ -8,6 +8,7 @@ var User = require('../models/user');
 var LoginHistory = require('../models/loginHistory');
 
 var crypto = require('crypto');
+var logger = require('./logger');
 
 // expose this function to our app using module.exports
 module.exports = function(passport) {
@@ -52,14 +53,18 @@ module.exports = function(passport) {
         // we are checking to see if the user trying to login already exists
         User.findOne({ 'email' :  email }, function(err, user) {
             // if there are any errors, return the error
-            if (err)
+            if (err) {
+				logger.error('Error while looking up for user ' + email + ': ' + err);
                 return done(err);
+			}
 
-            // check to see if theres already a user with that email
+            // check to see if there's already a user with that email
             if (user) {
+				logger.info('Attempt to re-create user ' + email);
                 return done(null, false, req.flash('signupMessage', 'E-mail já cadastrado'));
             } else {
 
+				logger.debug('Creating user ' + email);
                 // if there is no user with that email
                 // create the user
                 var newUser      = new User();
@@ -82,8 +87,11 @@ module.exports = function(passport) {
 				
                 // save the user
                 newUser.save(function(err) {
-                    if (err)
+                    if (err) {
+						logger.error('Error while creating user ' + email + ': ' + err);
                         throw err;
+					}
+					logger.info('Created user ' + email);
 					newUser.sendMail(false);
                     return done(null, false, req.flash('validationMessage', 'Um email de confirmação foi enviado para ' + newUser.email));
                 });
@@ -108,17 +116,22 @@ module.exports = function(passport) {
         // we are checking to see if the user trying to login already exists
         User.findOne({ 'email' :  email }, function(err, user) {
             // if there are any errors, return the error before anything else
-            if (err)
+            if (err) {
+				logger.error('Error while looking up for user ' + email + ': ' + err);
                 return done(err);
+			}
 
             // if no user is found, return the message
-            if (!user)
+            if (!user) {
+				logger.info('Attempt to log with non-existant user ' + email);
                 return done(null, false, req.flash('loginMessage', 'Usuário ou senha inválidos.')); // req.flash is the way to set flashdata using connect-flash
+			}
 
 			var loginHistory = new LoginHistory();
 			
             // if the user is found but the password is wrong
             if (!user.validPassword(password)) {
+				logger.warn('Attempt to log with user ' + email + ' with wrong password');
 				loginHistory.newLogin(user, false);
                 return done(null, false, req.flash('loginMessage', 'Usuário ou senha inválidos.')); // create the loginMessage and save it to session as flashdata
 			}
@@ -129,10 +142,13 @@ module.exports = function(passport) {
 			user.lastLogin = Date.now();
 
 			user.save(function(err) {
-				if (err)
+				if (err) {
+					logger.error('Error while saving user ' + email + ': ' + err );
 					return done(null, false, req.flash('loginMessage', 'Usuário ou senha inválidos.')); // create the loginMessage and save it to session as flashdata
+				}
 			});
 
+			logger.info('New login by user ' + email);
 			loginHistory.newLogin(user, true);
 			
             // all is well, return successful user

@@ -9,6 +9,7 @@ var path       = require('path');
 var templConf  = path.resolve(__dirname, '../views/mail', 'confirm');
 var templReset = path.resolve(__dirname, '../views/mail', 'reset');
 var config     = require('../config/setup.js');
+var logger     = require('../config/logger');
 
 var userSchema = mongoose.Schema( {
 	email     : { type: String, required: true, unique: true, trim: true },
@@ -73,11 +74,13 @@ userSchema.methods.sendMail = function(reset) {
 		};
 		smtp.sendMail(mailOptions, function(err) {
 			if (err)
-				console.log(err);
+				logger.error('US-Error while sending email to ' + user.email + ': ' + err);
 		});
 		return;
 	})
-	.catch(console.error);
+	.catch(err => {
+		logger.error('US-Error while rendering template ' + template + ' to be sent to user ' + user.email + ': ' + err);
+	});
 
 	return;
 };

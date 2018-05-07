@@ -19,6 +19,7 @@ gtag('set', {'user_id': '<%= user._id %>'}); // Set the user ID using signed-in 
 
 			<% if (user.superUser) { %>
 				<form class="navbar-form navbar-left" action="/mapa" method="post" onsubmit="return checkForm(this);">
+					<input type="hidden" name="_csrf" value="<%= _csrf %>">
 					<div class="form-group">
 						<label>Nome</label>
 						<input type="text" class="form-control" name="nome" required placeholder="Nome completo">

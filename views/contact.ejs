@@ -20,6 +20,7 @@
 			<h1>Entre em contato com o autor</h1>
 			<p>Informe abaixo o motivo de seu contato, seja d&uacute;vida, sugest&atilde;o, cr&iacute;tica ou agradecimento. Seu nome, endere&ccedil;o eletr&ocirc;nico e data de nascimento ser&atilde;o enviados de forma segura para que possamos personalizar sua resposta de acordo com o seu mapa do Ciclo da Vida.</p>
 			<form action="/contato" method="post">
+				<input type="hidden" name="_csrf" value="<%= _csrf %>">
 				<div class="form-group">
 					<label>Mensagem</label>
 					<textarea class="form-control" name="message" required placeholder="Informe sua mensagem aqui" rows="7"></textarea>

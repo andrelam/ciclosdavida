@@ -13,8 +13,8 @@ var app = express();
 var mongoose = require('mongoose');
 var passport = require('passport');
 var mercadopago = require('mercadopago');
-
 var config = require('./config/setup.js');
+var logger = require('./config/logger');
 
 var port = process.env.PORT || 2000;
 
@@ -22,26 +22,25 @@ var port = process.env.PORT || 2000;
 mongoose.Promise = global.Promise;
 mongoose.connect(config.dbUrl)
 .then(() => {
-	console.log('MongoDB connected');
+	logger.info('MongoDB connected');
 }).catch((err) => {
-	console.log('MongoDB connection error: ', err);
+	logger.error('MongoDB could not connect: ' + err);
 }); // connect to our database
 
 var db = mongoose.connection;
 
 const connectWithRetry = () => {
-	console.log('MongoDB connection with retry');
+	logger.info('MongoDB connection with retry');
 	return mongoose.connect(config.dbUrl);
 };
 
 db.on('error', err => {
-	console.log('MongoDB connection error: ', err);
+	logger.error('MongoDB could not connect: ' + err);
 	setTimeout(connectWithRetry, 1000);
 });
 
-
 db.on('connected', () => {
-	console.log('MongoDB connected');
+	logger.info('MongoDB connected');
 });
 
 //mercadopago.configure(config.mercadopago);
@@ -59,7 +58,7 @@ app.use(passport.session()); // persistent login sessions
 require('./config/routes.js')(app, passport); // load our routes and pass in our app and fully configured passport
 
 app.listen(port);
-console.log('Express app started on port ' + port);
+logger.info('Express app started on port ' + port);
 
 /**
  * Expose

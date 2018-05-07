@@ -17,6 +17,7 @@
 			<h1>Esqueceu sua senha?</h1>
 			<p>Informe o seu e-mail para receber um link para resetar a sua senha.</p>
 			<form action="/esqueci" method="post">
+				<input type="hidden" name="_csrf" value="<%= _csrf %>">
 				<div class="form-group">
 					<label>Email</label>
 					<input type="text" class="form-control" name="email" required placeholder="Informe seu e-mail">

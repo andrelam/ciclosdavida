@@ -2,6 +2,7 @@
 // load the things we need
 var mongoose = require('mongoose');
 var Schema   = mongoose.Schema;
+var logger   = require('../config/logger');
 
 var loginhistorySchema = mongoose.Schema( {
 	userId    : { type: Schema.Types.ObjectId, ref: 'User' },
@@ -14,8 +15,9 @@ loginhistorySchema.methods.newLogin = function(user, success) {
 	this.loginDate = Date.now();
 	this.success   = success;
 	this.save(function(err) {
-		if (err)
-			throw err;
+		if (err) {
+			logger.error('LHN-Error while saving Login History for user ' + user.email);
+		}
 	});
 	return;
 };

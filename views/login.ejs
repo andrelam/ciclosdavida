@@ -17,6 +17,7 @@
 			<h1>Acesse seu mapa!</h1>
 			<p>Utilize o seu e-mail e senhas cadastrados para acessar o seu mapa dos Ciclos da Vida.</p>
 			<form action="/acessar" method="post">
+				<input type="hidden" name="_csrf" value="<%= _csrf %>">
 				<div class="form-group">
 					<label>Email</label>
 					<input type="text" class="form-control" name="email" required placeholder="Informe seu e-mail">

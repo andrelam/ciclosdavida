@@ -1,6 +1,7 @@
 var path = require('path');
 var express = require('express');
 var session = require('express-session');
+var csrf = require('csurf');
 var compression = require('compression');
 var cookieParser = require('cookie-parser');
 var cookieSession = require('cookie-session');
@@ -11,8 +12,10 @@ var ejs    = require('ejs');
 var flash = require('connect-flash');
 var pkg = require('../package.json');
 var config = require('./setup');
+var logger = require('./logger');
+var favicon = require('serve-favicon');
 
-var env = process.env.NODE_ENV || 'development';
+const env   = process.env.NODE_ENV || 'development';
 
 /**
  * Expose
@@ -28,23 +31,29 @@ module.exports = function (app, passport) {
   // Static files middleware
   app.use(express.static(path.join(__dirname, '/../public'))); //Expose /public
 
+  app.use(favicon(path.join(__dirname, '/../public', 'favicon.ico')));
+  
   // Use winston on production
   var log;
   if (env !== 'development') {
-    log = {
-      stream: {
-        write: function (message, encoding) {
-          winston.info(message);
-        }
-      }
-    };
+    log = 'combined';
   } else {
     log = 'dev';
   }
 
   // Don't log during tests
   // Logging middleware
-  if (env !== 'test') app.use(morgan(log));
+  app.use(morgan(log, {
+    skip: function (req, res) {
+        return res.statusCode < 400
+    }, stream: process.stderr
+  }));
+
+  app.use(morgan(log, {
+    skip: function (req, res) {
+        return res.statusCode >= 400
+    }, stream: process.stdout
+  }));
 
   // set views path, template engine and default layout
   app.set('view engine', 'ejs');
@@ -75,8 +84,30 @@ module.exports = function (app, passport) {
   app.use(session({
     resave: true,
     saveUninitialized: true,
-    secret: config.secret
+    secret: config.secret,
+	cookie: { httpOnly: true,
+              secure: true }
   }));
+
+  app.use(csrf());
+
+  app.use(function(req, res, next) {
+	  res.cookie("XSRF-TOKEN", req.csrfToken());
+	  return next();
+  });
+
+  // error handler
+  app.use(function (err, req, res, next) {
+    if (err.code !== 'EBADCSRFTOKEN')
+		return next(err);
+
+	logger.error('CSRF attempt detected: ' + err);
+    // handle CSRF token errors here
+    res.status(403);
+	logger.warn('Returning HTTP 403 and redirecting to home page');
+	req.logout();
+	res.redirect('/');
+  });
 
   // connect flash for flash messages - should be declared after sessions
   app.use(flash());

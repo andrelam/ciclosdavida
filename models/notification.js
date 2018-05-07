@@ -2,6 +2,7 @@
 // load the things we need
 var mongoose = require('mongoose');
 var Schema   = mongoose.Schema;
+var logger   = require('../config/logger');
 
 var notificationSchema = mongoose.Schema( {
 	userId      : { type: Schema.Types.ObjectId, ref: 'User', required: true },
@@ -21,7 +22,7 @@ notificationSchema.methods.newNotification = function(user, text) {
 	this.replied     = false;
 	this.save(function(err) {
 		if (err)
-			throw err;
+			logger.error('NNN-Error while saving Notification from user ' + user.email);
 	});
 	return;
 };
@@ -32,7 +33,7 @@ notificationSchema.methods.replyNotification = function(user, text) {
 	this.repliedBy   = user._id,
 	this.save(function(err) {
 		if (err)
-			throw err;
+			logger.error('NRN-Error while saving reply for Notification from user ' + user.email);
 	});
 	return;
 };
