@@ -34,12 +34,7 @@ module.exports = function (app, passport) {
   app.use(favicon(path.join(__dirname, '/../public', 'favicon.ico')));
   
   // Use winston on production
-  var log;
-  if (env !== 'development') {
-    log = 'combined';
-  } else {
-    log = 'dev';
-  }
+  var log = config.logging.format || 'dev';
 
   // Don't log during tests
   // Logging middleware

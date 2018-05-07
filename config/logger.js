@@ -1,6 +1,8 @@
-﻿const winston = require("winston");
+﻿var config = require('./setup');
 
-const level = process.env.LOG_LEVEL || 'debug';
+const winston = require("winston");
+
+var level = process.env.LOG_LEVEL || config.logging.level || 'debug';
 
 var logger = new winston.Logger({
 	transports: [
