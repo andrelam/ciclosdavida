@@ -14,6 +14,7 @@ var pkg = require('../package.json');
 var config = require('./setup');
 var logger = require('./logger');
 var favicon = require('serve-favicon');
+var helmet = require('helmet');
 
 const env   = process.env.NODE_ENV || 'development';
 
@@ -22,6 +23,8 @@ const env   = process.env.NODE_ENV || 'development';
  */
 
 module.exports = function (app, passport) {
+
+  app.use(helmet());
 
   // Compression middleware (should be placed before express.static)
   app.use(compression({
@@ -80,6 +83,7 @@ module.exports = function (app, passport) {
     resave: true,
     saveUninitialized: true,
     secret: config.secret,
+    name: 'sessionId',
 	cookie: { httpOnly: true,
               secure: true }
   }));
