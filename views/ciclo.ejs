@@ -3,6 +3,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+	<meta name="description" content="Aqui voc&ecirc; tem acesso ao seu Mapa Pessoal conforme explicado no livro Os Ciclos da Vida - A Cabal&aacute; e a Peregrina&ccedil;&atilde;o da Alma - de Jos&eacute; Arnaldo de Castro.">
+	<title>Os Ciclos da Vida | Mapa Pessoal</title>
     <% include head.ejs %>
 	<link rel="stylesheet" href="/print.css" type="text/css" media="print">
 </head>
@@ -62,8 +64,8 @@
 			<tr>
 			<td colspan='2' style='font-size: 80%; text-align:center; width: "3.4%"'><img src='https://s3.amazonaws.com/www.coldfire.com.br/images/<%= data.ciclo.meses[0].semanas[w].nomeSemana %>.png' alt='<%= data.ciclo.meses[0].semanas[w].nomeSemana %>' height=14></img></td>
 			<% for (var m = 0; m <= 6; m++) { %>
-			<td style='font-size: 80%; width: "6.9%"'><% if (data.ciclo.meses[m].semanas[w].corrente) { %><b><% } %><%= data.ciclo.meses[m].semanas[w].inicioSemana %><% if (data.ciclo.meses[m].semanas[w].corrente) { %></b><% } %></td>
-			<td style='font-size: 80%; width: "6.9%"'><% if (data.ciclo.meses[m].semanas[w].corrente) { %><b><% } %><%= data.ciclo.meses[m].semanas[w].fimSemana %><% if (data.ciclo.meses[m].semanas[w].corrente) { %></b><% } %></td>
+			<td style='font-size: 80%; width: "6.9%"<% if (data.ciclo.meses[m].semanas[w].inicioSemana === data.ciclo.RoshHashanah) { %>; color: blue<% } %>'><% if (data.ciclo.meses[m].semanas[w].corrente) { %><b><% } %><%= data.ciclo.meses[m].semanas[w].inicioSemana %><% if (data.ciclo.meses[m].semanas[w].corrente) { %></b><% } %></td>
+			<td style='font-size: 80%; width: "6.9%"<% if (data.ciclo.meses[m].semanas[w].fimSemana === data.ciclo.Pessach) { %>; color: red<% } %>'><% if (data.ciclo.meses[m].semanas[w].corrente) { %><b><% } %><%= data.ciclo.meses[m].semanas[w].fimSemana %><% if (data.ciclo.meses[m].semanas[w].corrente) { %></b><% } %></td>
 			<% } %>
 			</tr>
 			<% } %>
@@ -72,7 +74,7 @@
 
 	<div id="page-wrapper" style="padding-left: 5px; padding-right: 5px">
 		<div class="row">
-			<div class="col-lg-12 text-center"><h4>A leitura pr&eacute;via do livro &eacute; imprescind&iacute;vel para a comprens&atilde;o do seu Mapa!</h4></div>
+			<div class="col-lg-12 text-center"><h4>A leitura pr&eacute;via do livro &eacute; imprescind&iacute;vel para a compreens&atilde;o do seu Mapa!</h4></div>
 		</div>
 	</div>
 	

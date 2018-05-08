@@ -91,6 +91,9 @@ function calculateCycle(difference)
 	var dia = difference + 1;
 	var diaNoMes = difference + (7 * (semana - 1));
 	
+	var diaPessach;
+	var diaRoshHashanah;
+	
 	var inicioMes = new Date();
 	inicioMes.setMilliseconds(0);
 	inicioMes.setSeconds(0);
@@ -120,9 +123,16 @@ function calculateCycle(difference)
 				fimSemana: fimSemana,
 				corrente: ( m == 0 && w == semana - 1)
 			};
+			if (numeroMes == 1 && w == 0) {
+				diaRoshHashanah = inicioSemana;
+			};
+			if (numeroMes == 7 && w == 6) {
+				diaPessach = fimSemana;
+			}
 			semanas.push(listaSemana);
 		}
 		var listaMes = {
+			numeroMes: numeroMes,
 			nomeMes: nomeMes,
 			semanas: semanas
 		};
@@ -148,6 +158,8 @@ function calculateCycle(difference)
 		nomeSemana: formatSefirah(semana - 1),
 		dia: dia,
 		nomeDia: formatSefirah(dia - 1),
+		Pessach: diaPessach,
+		RoshHashanah: diaRoshHashanah,
 		meses: meses
 	}
 	return data;
