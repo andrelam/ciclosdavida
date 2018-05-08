@@ -65,7 +65,7 @@
 			<td colspan='2' style='font-size: 80%; text-align:center; width: "3.4%"'><img src='https://s3.amazonaws.com/www.coldfire.com.br/images/<%= data.ciclo.meses[0].semanas[w].nomeSemana %>.png' alt='<%= data.ciclo.meses[0].semanas[w].nomeSemana %>' height=14></img></td>
 			<% for (var m = 0; m <= 6; m++) { %>
 			<td style='font-size: 80%; width: "6.9%"<% if (data.ciclo.meses[m].semanas[w].inicioSemana === data.ciclo.RoshHashanah) { %>; color: blue<% } %>'><% if (data.ciclo.meses[m].semanas[w].corrente) { %><b><% } %><%= data.ciclo.meses[m].semanas[w].inicioSemana %><% if (data.ciclo.meses[m].semanas[w].corrente) { %></b><% } %></td>
-			<td style='font-size: 80%; width: "6.9%"<% if (data.ciclo.meses[m].semanas[w].fimSemana === data.ciclo.Pessach) { %>; color: red<% } %>'><% if (data.ciclo.meses[m].semanas[w].corrente) { %><b><% } %><%= data.ciclo.meses[m].semanas[w].fimSemana %><% if (data.ciclo.meses[m].semanas[w].corrente) { %></b><% } %></td>
+			<td style='font-size: 80%; width: "6.9%"<% if (data.ciclo.meses[m].semanas[w].fimSemana === data.ciclo.Shabat) { %>; color: red<% } %>'><% if (data.ciclo.meses[m].semanas[w].corrente) { %><b><% } %><%= data.ciclo.meses[m].semanas[w].fimSemana %><% if (data.ciclo.meses[m].semanas[w].corrente) { %></b><% } %></td>
 			<% } %>
 			</tr>
 			<% } %>

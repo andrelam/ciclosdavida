@@ -91,7 +91,7 @@ function calculateCycle(difference)
 	var dia = difference + 1;
 	var diaNoMes = difference + (7 * (semana - 1));
 	
-	var diaPessach;
+	var diaShabatAnual;
 	var diaRoshHashanah;
 	
 	var inicioMes = new Date();
@@ -127,7 +127,7 @@ function calculateCycle(difference)
 				diaRoshHashanah = inicioSemana;
 			};
 			if (numeroMes == 7 && w == 6) {
-				diaPessach = fimSemana;
+				diaShabatAnual = fimSemana;
 			}
 			semanas.push(listaSemana);
 		}
@@ -158,7 +158,7 @@ function calculateCycle(difference)
 		nomeSemana: formatSefirah(semana - 1),
 		dia: dia,
 		nomeDia: formatSefirah(dia - 1),
-		Pessach: diaPessach,
+		Shabat: diaShabatAnual,
 		RoshHashanah: diaRoshHashanah,
 		meses: meses
 	}
@@ -204,3 +204,43 @@ exports.calcula = function (data, nome) {
 	
 };
 
+exports.validateDate = function(dateText) {
+
+	var error = false;
+
+	var minYear = 1902;
+	var maxYear = (new Date()).getFullYear();
+
+	// regular expression to match required date format
+	re = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
+
+	if(dateText != '') {
+		if(regs = dateText.match(re)) {
+			if(regs[1] < 1 || regs[1] > 31) {
+				error = true;
+			} else if(regs[2] < 1 || regs[2] > 12) {
+				error = true;
+			} else if(regs[3] < minYear || regs[3] > maxYear) {
+				error = true;
+			}
+		} else {
+			error = true;
+		}
+	} else {
+		error = true;
+	}
+
+	if(error) {
+		return false;
+	} else {
+		var datas = dateText.match(re);
+		var data = new Date(datas[3], datas[2] - 1, datas[1], 0, 0, 0, 0);
+		if (data.getUTCFullYear() == datas[3] && (data.getUTCMonth() + 1) == datas[2] && data.getUTCDate() == datas[1]) {
+			if (data > Date.now())
+				return false;
+			return true;
+		}
+		return false;
+	}
+
+}

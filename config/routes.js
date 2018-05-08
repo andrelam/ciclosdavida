@@ -5,6 +5,8 @@ var User         = require('../models/user');
 var Notification = require('../models/notification');
 var crypto       = require('crypto');
 var logger       = require('./logger');
+const { check, validationResult } = require('express-validator/check');
+const { matchedData, sanitize } = require('express-validator/filter');
 
 module.exports = function(app, passport) {
 
@@ -39,15 +41,36 @@ module.exports = function(app, passport) {
     // =====================================
     // show the signup form
     app.get('/registro', function(req, res) {
-
+		var dados = { nome: '',
+					  email: '',
+					  data: '' };
         // render the page and pass in any flash data if it exists
-        res.render('signup.ejs', { message: req.flash('signupMessage'), _csrf: req.csrfToken() });
+        res.render('signup.ejs', { message: req.flash('signupMessage'), _csrf: req.csrfToken(), dados: dados, errors: [] });
     });
 
-	app.post('/registro', passport.authenticate('local-signup', {
-		successRedirect : '/', // redirect to the secure profile section
-		failureRedirect : '/', // redirect back to the signup page if there is an error
-		failureFlash : true // allow flash messages
+	app.post('/registro', [
+		check('nome').isLength({ min: 1 }).withMessage('Favor informar o seu nome').trim(),
+		check('email').isEmail().withMessage('Favor informar um endereço de email válido').trim(),
+		check('password').isLength({ min: 8 }).withMessage('A senha deve possuir pelo menos 8 caracteres'),
+		check('cfm_pwd', 'A senha de confirmação deve ser igual à senha informada').exists().custom((value, { req }) => value === req.body.password),
+		check('data', 'A data de nascimento deve ser uma data válida').custom((value) => logic.validateDate(value))
+	], (req, res, next) => {
+
+		const errors = validationResult(req);
+		if (!errors.isEmpty()) {
+			var dados = { nome: req.body.nome,
+			              email: req.body.email,
+						  data: req.body.data };
+			res.render('signup.ejs', { message: req.flash('signupMessage'), _csrf: req.csrfToken(), dados: dados, errors: errors.array() });
+			return;
+		} else {
+			check('email').normalizeEmail();
+		}
+	
+	}, passport.authenticate('local-signup', {
+			successRedirect : '/', // redirect to the secure profile section
+			failureRedirect : '/registro', // redirect back to the signup page if there is an error
+			failureFlash : true // allow flash messages
     }));
 
 	app.get('/contato', function(req, res) {
