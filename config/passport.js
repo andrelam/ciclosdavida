@@ -43,7 +43,7 @@ module.exports = function(passport) {
         passwordField : 'password',
         passReqToCallback : true // allows us to pass back the entire request to the callback
     },
-    function(req, e_mail, pass_word, done) {
+    function(req, email, password, done) {
 
 			// asynchronous
 			// User.findOne wont fire unless data is sent back
@@ -51,27 +51,27 @@ module.exports = function(passport) {
 
 			// find a user whose email is the same as the forms email
 			// we are checking to see if the user trying to login already exists
-			User.findOne({ 'email' :  e_mail }, function(err, user) {
+			User.findOne({ 'email' :  email }, function(err, user) {
 				// if there are any errors, return the error
 				if (err) {
-					logger.error('Error while looking up for user ' + e_mail + ': ' + err);
+					logger.error('Error while looking up for user ' + email + ': ' + err);
 					return done(err);
 				}
 
 				// check to see if there's already a user with that email
 				if (user) {
-					logger.info('Attempt to re-create user ' + e_mail);
+					logger.info('Attempt to re-create user ' + email);
 					return done(null, false, req.flash('signupMessage', 'E-mail já cadastrado'));
 				} else {
 
-					logger.debug('Creating user ' + e_mail);
+					logger.debug('Creating user ' + email);
 					// if there is no user with that email
 					// create the user
 					var newUser      = new User();
 
 					// set the user's local credentials
-					newUser.email    = e_mail;
-					newUser.password = newUser.generateHash(pass_word);
+					newUser.email    = email;
+					newUser.password = newUser.generateHash(password);
 					newUser.nome     = req.body.nome;
 					var re = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
 
@@ -88,10 +88,10 @@ module.exports = function(passport) {
 					// save the user
 					newUser.save(function(err) {
 						if (err) {
-							logger.error('Error while creating user ' + e_mail + ': ' + err);
+							logger.error('Error while creating user ' + email + ': ' + err);
 							throw err;
 						}
-						logger.info('Created user ' + e_mail);
+						logger.info('Created user ' + email);
 						newUser.sendMail(false);
 						return done(null, false, req.flash('validationMessage', 'Um email de confirmação foi enviado para ' + newUser.email));
 					});

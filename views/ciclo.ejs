@@ -1,5 +1,4 @@
 ﻿<!-- views/index.ejs -->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,15 +8,11 @@
 	<link rel="stylesheet" href="/print.css" type="text/css" media="print">
 </head>
 <body>
-
     <% include cicloheader.ejs %>
-
 	<% if (message.length > 0) { %>
 		<div class="alert alert-success alert-dismissible fade-in" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Fechar"><span aria-hidden="true">&times;</span></button><%= message %></div>
 	<% } %>
-
 	<div id="content" class="print">
-	
 	<div id="page-wrapper" style="padding-left: 5px; padding-right: 5px">
 		<div class="row">
 			<div class="col-lg-12">
@@ -64,23 +59,19 @@
 			<tr>
 			<td colspan='2' style='font-size: 80%; text-align:center; width: "3.4%"'><img src='https://s3.amazonaws.com/www.coldfire.com.br/images/<%= data.ciclo.meses[0].semanas[w].nomeSemana %>.png' alt='<%= data.ciclo.meses[0].semanas[w].nomeSemana %>' height=14></img></td>
 			<% for (var m = 0; m <= 6; m++) { %>
-			<td style='font-size: 80%; width: "6.9%"<% if (data.ciclo.meses[m].semanas[w].inicioSemana === data.ciclo.RoshHashanah) { %>; color: blue<% } %>'><% if (data.ciclo.meses[m].semanas[w].corrente) { %><b><% } %><%= data.ciclo.meses[m].semanas[w].inicioSemana %><% if (data.ciclo.meses[m].semanas[w].corrente) { %></b><% } %></td>
-			<td style='font-size: 80%; width: "6.9%"<% if (data.ciclo.meses[m].semanas[w].fimSemana === data.ciclo.Shabat) { %>; color: red<% } %>'><% if (data.ciclo.meses[m].semanas[w].corrente) { %><b><% } %><%= data.ciclo.meses[m].semanas[w].fimSemana %><% if (data.ciclo.meses[m].semanas[w].corrente) { %></b><% } %></td>
+			<td style='font-size: 80%; width: "6.9%"<% if (data.ciclo.meses[m].semanas[w].inicioSemana === data.ciclo.RoshHashanah) { %>; color: blue'><abbr title='Este dia &eacute; o seu Rosh haShanah pessoal'><% } else { %>'><% } %><% if (data.ciclo.meses[m].semanas[w].corrente) { %><b><% } %><%= data.ciclo.meses[m].semanas[w].inicioSemana %><% if (data.ciclo.meses[m].semanas[w].corrente) { %></b><% } %><% if (data.ciclo.meses[m].semanas[w].inicioSemana === data.ciclo.RoshHashanah) { %></abbr><% } %></td>
+			<td style='font-size: 80%; width: "6.9%"<% if (data.ciclo.meses[m].semanas[w].fimSemana === data.ciclo.Shabat) { %>; color: red'><abbr title='Este dia &eacute; o seu Shabat anual pessoal'><% } else { %>'><% } %><% if (data.ciclo.meses[m].semanas[w].corrente) { %><b><% } %><%= data.ciclo.meses[m].semanas[w].fimSemana %><% if (data.ciclo.meses[m].semanas[w].corrente) { %></b><% } %><% if (data.ciclo.meses[m].semanas[w].fimSemana === data.ciclo.Shabat) { %></abbr><% } %></td>
 			<% } %>
 			</tr>
 			<% } %>
 		</table>
 	</div>
-
 	<div id="page-wrapper" style="padding-left: 5px; padding-right: 5px">
 		<div class="row">
 			<div class="col-lg-12 text-center"><h4>A leitura pr&eacute;via do livro &eacute; imprescind&iacute;vel para a compreens&atilde;o do seu Mapa!</h4></div>
 		</div>
 	</div>
-	
     <% include footer.ejs %>
-
 	</div>
-    
 </body>
 </html>

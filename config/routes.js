@@ -5,8 +5,8 @@ var User         = require('../models/user');
 var Notification = require('../models/notification');
 var crypto       = require('crypto');
 var logger       = require('./logger');
-const { check, validationResult } = require('express-validator/check');
-const { matchedData, sanitize } = require('express-validator/filter');
+var { check, validationResult } = require('express-validator/check');
+var { matchedData, sanitize } = require('express-validator/filter');
 
 module.exports = function(app, passport) {
 
@@ -19,22 +19,33 @@ module.exports = function(app, passport) {
 		}
 	});
 
-
 	// =====================================
     // LOGIN ===============================
     // =====================================
     // show the login form
     app.get('/acessar', function(req, res) {
         // render the page and pass in any flash data if it exists
-        res.render('login.ejs', { message: req.flash('loginMessage'), user: req.user, _csrf: req.csrfToken() }); 
+		var dados = { email: '' };
+        res.render('login.ejs', { message: req.flash('loginMessage'), user: req.user, _csrf: req.csrfToken(), dados: dados, errors: [] }); 
     });
 
     // process the login form
-	app.post('/acessar', passport.authenticate('local-login', {
-		successRedirect : '/mapa',
-		failureRedirect : '/acessar',
-		failureFlash    : true }
-	));
+	app.post('/acessar', [
+		check('email').isEmail().withMessage('Informar um endereço de email válido').trim(),
+		check('password').isLength({ min: 1 }).withMessage('Informar a senha')
+	], (req, res, next) => {
+		const errors = validationResult(req);
+		if (!errors.isEmpty()) {
+			var dados = { email: req.body.email };
+			res.render('login.ejs', { message: req.flash('loginMessage'), user: req.user, _csrf: req.csrfToken(), dados: dados, errors: errors.array() });
+			return;
+		}
+		check('email').normalizeEmail();
+		passport.authenticate('local-login', {
+			successRedirect : '/mapa',
+			failureRedirect : '/acessar',
+			failureFlash    : true })(req,res,next);
+	});
 
     // =====================================
     // SIGNUP ==============================
@@ -63,15 +74,13 @@ module.exports = function(app, passport) {
 						  data: req.body.data };
 			res.render('signup.ejs', { message: req.flash('signupMessage'), _csrf: req.csrfToken(), dados: dados, errors: errors.array() });
 			return;
-		} else {
-			check('email').normalizeEmail();
 		}
-	
-	}, passport.authenticate('local-signup', {
+		check('email').normalizeEmail();
+		passport.authenticate('local-signup', {
 			successRedirect : '/', // redirect to the secure profile section
-			failureRedirect : '/registro', // redirect back to the signup page if there is an error
-			failureFlash : true // allow flash messages
-    }));
+			failureRedirect : '/', // redirect back to the signup page if there is an error
+			failureFlash : true })(req,res,next);
+	});
 
 	app.get('/contato', function(req, res) {
 		if (!req.isAuthenticated()) {
@@ -97,10 +106,18 @@ module.exports = function(app, passport) {
     });
 
 	app.get('/esqueci', function(req, res) {
-		res.render('forgot.ejs', { message: req.flash('forgotMessage'), _csrf: req.csrfToken() });
+		res.render('forgot.ejs', { message: req.flash('forgotMessage'), _csrf: req.csrfToken(), errors: [], email: '' });
 	});
 
-	app.post('/esqueci', function(req, res, next) {
+	app.post('/esqueci', [
+		check('email').isEmail().withMessage('Informar um endereço de email válido').trim()
+	], (req, res, next) => {
+		const errors = validationResult(req);
+		if (!errors.isEmpty()) {
+			res.render('forgot.ejs', { message: req.flash('forgotMessage'), _csrf: req.csrfToken(), errors: errors.array(), email: req.body.email });
+			return;
+		}
+		check('email').normalizeEmail();
 		User.findOne({ email: req.body.email }, function(err, user) {
 			if (err) {
 				logger.error('RPE-Error while searching user ' + req.body.email + ': ' + err);
@@ -147,7 +164,7 @@ module.exports = function(app, passport) {
 					req.flash('validationMessage', 'Token para reset da senha expirado');
 					return res.redirect('/');
 				}
-				res.render('reset.ejs', { message: req.flash('validationMessage'), user: req.user, token: user.resetToken, _csrf: req.csrfToken() });
+				res.render('reset.ejs', { message: req.flash('validationMessage'), token: user.resetToken, _csrf: req.csrfToken(), errors: [] });
 			} else { // New user
 				user.resetToken = undefined;
 				user.resetValid = undefined;
@@ -166,7 +183,16 @@ module.exports = function(app, passport) {
 		});
 	});
 
-	app.post('/redefinir/:token', function(req, res) {
+	app.post('/redefinir/:token', [
+		check('password').isLength({ min: 8 }).withMessage('A senha deve possuir pelo menos 8 caracteres'),
+		check('cfm_pwd', 'A senha de confirmação deve ser igual à senha informada').exists().custom((value, { req }) => value === req.body.password)
+	], (req, res, next) => {
+
+		const errors = validationResult(req);
+		if (!errors.isEmpty()) {
+			res.render('reset.ejs', { message: req.flash('validationMessage'), token: req.params.token, _csrf: req.csrfToken(), errors: errors.array() });
+			return;
+		} 
 		User.findOne({ resetToken: req.params.token, resetValid: { $gt: Date.now() } }, function(err, user) {
 			if (err) {
 				logger.error('RPRT-Error while searching token ' + req.params.token + ': ' + err);

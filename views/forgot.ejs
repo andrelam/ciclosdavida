@@ -1,5 +1,4 @@
 <!-- views/index.ejs -->
-
 <!DOCTYPE html>
 <html lang="pt">
 <head>
@@ -8,13 +7,14 @@
     <% include head.ejs %>
 </head>
 <body>
-
     <% include header.ejs %>
-
 	<div class="container">
 		<div class="col-sm-8 col-sm-offset-2">
 			<% if (message.length > 0) { %>
 				<div class="alert alert-success alert-dismissible fade-in" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Fechar"><span aria-hidden="true">&times;</span></button><%= message %></div>
+			<% } %>
+			<% for (var i = 0; i < errors.length; i++) { %>
+				<div class="alert alert-danger alert-dismissible fade-in" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Fechar"><span aria-hidden="true">&times;</span></button><%= errors[i].msg %></div>
 			<% } %>
 			<h1>Esqueceu sua senha?</h1>
 			<p>Informe o seu e-mail para receber um link para resetar a sua senha.</p>
@@ -22,15 +22,12 @@
 				<input type="hidden" name="_csrf" value="<%= _csrf %>">
 				<div class="form-group">
 					<label>Email</label>
-					<input type="text" class="form-control" name="email" required placeholder="Informe seu e-mail">
+					<input type="text" class="form-control" name="email" placeholder="Informe seu e-mail"  value="<%= email %>">
 				</div>
 				<button type="submit" class="btn btn-warning btn-lg">Resetar senha</button>
 			</form>
 		</div>
-
 	</div>
-	
 	<% include footer.ejs %>
-
 </body>
 </html>
