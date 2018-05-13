@@ -6,6 +6,9 @@
 	<title>Os Ciclos da Vida | Mapa Pessoal</title>
     <% include head.ejs %>
 	<link rel="stylesheet" href="/print.css" type="text/css" media="print">
+	<style>
+		.print-only { display: none; }
+	</style>
 </head>
 <body>
     <% include cicloheader.ejs %>
@@ -73,8 +76,5 @@
 		</div>
 		<% include footer.ejs %>
 	</div>
-	<script>
-	gtag('set', {'user_id': '<%= user._id %>'}); // Set the user ID using signed-in user_id.
-	</script>
 </body>
 </html>

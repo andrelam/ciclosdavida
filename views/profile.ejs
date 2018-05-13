@@ -7,13 +7,7 @@
     <% include head.ejs %>
 </head>
 <body>
-
-    <% include header.ejs %>
-
-	<script>
-	gtag('set', {'user_id': '<%= user._id %>'}); // Set the user ID using signed-in user_id.
-	</script>
-
+    <% include headerUser.ejs %>
 	<div class="container">
 		<div class="col-sm-8 col-sm-offset-2">
 			<% if (message.length > 0) { %>

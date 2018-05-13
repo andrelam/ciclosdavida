@@ -5,6 +5,7 @@
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
+  gtag('set', {'user_id': '<%= user._id %>'}); // Set the user ID using signed-in user_id.
   gtag('config', 'UA-40075435-3');
 </script>
 <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
