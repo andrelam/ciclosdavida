@@ -12,6 +12,9 @@
 	<% if (message.length > 0) { %>
 		<div class="alert alert-success alert-dismissible fade-in" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Fechar"><span aria-hidden="true">&times;</span></button><%= message %></div>
 	<% } %>
+	<% for (var i = 0; i < errors.length; i++) { %>
+		<div class="alert alert-danger alert-dismissible fade-in" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Fechar"><span aria-hidden="true">&times;</span></button><%= errors[i].msg %></div>
+	<% } %>
 	<div id="content" class="print">
 		<div id="page-wrapper" style="padding-left: 5px; padding-right: 5px">
 			<div class="row">
