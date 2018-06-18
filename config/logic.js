@@ -197,6 +197,7 @@ exports.calcula = function (data, nome) {
 		hoje: formatDate(hoje),
 		numeroDias: numeroDias,
 		anoAbsoluto: (( numeroDias - (numeroDias % 343) ) / 343) + 1,
+		anoAbsolutoPrecise: (Math.round((numeroDias / 343) * 1000) / 1000),
 		ciclo: calculateCycle(numeroDias)
 	}
 
