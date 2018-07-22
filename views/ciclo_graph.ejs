@@ -7,6 +7,7 @@
     <% include head.ejs %>
 	<link rel="stylesheet" href="/print.css" type="text/css" media="print">
 	<link rel="stylesheet" href="/graph.css" type="text/css">
+	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 </head>
 <body>
     <% include cicloheader.ejs %>
@@ -70,11 +71,78 @@
 				<% } %>
 			</table>
 		</div>
+		<div id="chart_div"></div>
+		<script type="text/javascript">
+var data;
+var options;
+let chart;
+var stndDev = 16;
+var mean = 49;
+let xMin = 0;
+let xMax = mean * 2;
+let xValue = <%= data.anoAbsolutoPrecise %>;
+let xLeft = xValue - 0.1;
+let xRight = xValue + 0.1;
+
+google.charts.load("current", { packages: ["corechart"] });
+google.charts.setOnLoadCallback(prepareChart);
+
+function prepareChart() {
+  data = new google.visualization.DataTable();
+  setChartOptions();
+  addColumns();
+  addData();
+  drawChart();
+}
+function setChartOptions() {
+  options = { legend: "none", title: "Do berço à sepultura", titleFontSize: 30 };
+  options.hAxis = {};
+  options.hAxis.ticks = [0, 7, 14, 21, 28, 35, 42, 49, 56, 63, 70, 77, 84, 91, 98];
+  options.hAxis.textPosition = 'out';
+  options.vAxis = {};
+  options.vAxis.gridlines = {};
+  options.vAxis.gridlines.count = 2;
+  options.vAxis.textPosition = 'none';
+  return options;
+}
+function addColumns() {
+  data.addColumn("number", "X Value");
+  data.addColumn("number", "Y Value");
+  data.addColumn({ type: "boolean", role: "scope" });
+  data.addColumn({ type: "string", role: "style" });
+}
+function addData() {
+  data.addRows(createArray(xMin, xMax, xLeft, xRight, mean, stndDev));
+}
+function createArray(xMin, xMax, xLeft, xRight, mean, stndDev) {
+  let chartData = new Array([]);
+  let index = 0;
+  for (var i = xMin; i <= xMax; i += 0.1) {
+    chartData[index] = new Array(4);
+    chartData[index][0] = i;
+    chartData[index][1] = Math.sin(i*Math.PI/98); 
+
+    if (i < xLeft || i > xRight) { //(i < xLeft || i > xRight) {
+      chartData[index][2] = false;
+    }
+    chartData[index][3] =
+      "opacity: 1; + color: #8064A2; + stroke-color: black; ";
+
+    index++;
+  }
+  return chartData;
+}
+function drawChart() {
+  chart = new google.visualization.AreaChart(
+    document.getElementById("chart_div")
+  );
+  chart.draw(data, options);
+}
+		</script>
 		<div id="page-wrapper" style="padding-left: 5px; padding-right: 5px">
 			<div class="row">
 				<div class="col-lg-12 text-center"><h4>A leitura pr&eacute;via do livro &eacute; imprescind&iacute;vel para a compreens&atilde;o do seu Mapa!<br />
-				<div class="noprint">Em caso de d&uacute;vidas, n&atilde;o hesite em contactar o autor por e-mail clicando <a href="mailto:castrof@uol.com.br?cc=ciclosdavida@coldfire.com.br&subject=Mapa%20dos%20Ciclos%20da%20Vida">aqui</a>.</div>
-				<div class="print-only">Em caso de d&uacute;vidas, n&atilde;o hesite em contactar o autor pelo e-mail castrof@uol.com.br.</div></h4></div>
+				<div class="noprint">Em caso de d&uacute;vidas, n&atilde;o hesite em contactar o autor por <a href="mailto:castrof@uol.com.br?cc=ciclosdavida@coldfire.com.br&subject=Mapa%20dos%20Ciclos%20da%20Vida">email</a>.</div></h4></div>
 			</div>
 		</div>
 		<% include footer.ejs %>
