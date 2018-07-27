@@ -11,6 +11,60 @@
 	</style>
 </head>
 <body>
+	<script type='application/ld+json'>
+	{
+		"@context": "http://schema.org/",
+		"@type": "Book",
+		"bookFormat": {
+			"@type": "BookFormatType",
+			"name": "http://schema.org/Paperback"
+		},
+		"isbn": "9788536656472",
+		"numberOfPages": "320",
+		"author": {
+			"@type":"Person",
+			"name":"José Arnaldo de Castro"
+		},
+		"name": "Os Ciclos da Vida",
+		"image": "https://s3.amazonaws.com/www.coldfire.com.br/images/capa.jpg",
+		"inLanguage": {
+			"@type": "Language",
+			"name": "pt_BR"
+		},
+		"url": "http://www.asabeca.com.br/detalhes.php?prod=8552",
+		"sameAs": "http://www.scortecci.com.br/catalogo/detalhes.php?id=5816",
+		"workExample" : [{
+			"@type": "Book",
+			"isbn": "9788536656472",
+			"bookEdition": "1a. Edição",
+			"bookFormat": "http://schema.org/Paperback",
+			"potentialAction":{
+				"@type":"ReadAction",
+				"target":
+				{
+					"@type":"EntryPoint",
+					"urlTemplate":"http://www.asabeca.com.br/detalhes.php?prod=8552",
+					"actionPlatform":[
+						"http://schema.org/DesktopWebPlatform",
+						"http://schema.org/IOSPlatform",
+						"http://schema.org/AndroidPlatform",
+						"http://schema.org/MobileWebPlatform"
+					]
+				},
+				"expectsAcceptanceOf":{
+					"@type":"Offer",
+					"Price":70.00,
+					"priceCurrency":"BRL",
+					"eligibleRegion" : {
+						"@type":"Country",
+						"name":"BR"
+					},
+					"availability": "http://schema.org/InStock"
+				}
+			}
+		}]
+	}
+	</script>
     <% include header.ejs %>
 	<% if (message.length > 0) { %>
 		<div class="alert alert-success alert-dismissible fade-in" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Fechar"><span aria-hidden="true">&times;</span></button><%= message %></div>
