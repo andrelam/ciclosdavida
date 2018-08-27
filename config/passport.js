@@ -51,26 +51,26 @@ module.exports = function(passport) {
 
 			// find a user whose email is the same as the forms email
 			// we are checking to see if the user trying to login already exists
-			User.findOne({ 'email' :  email }, function(err, user) {
+			User.findOne({ 'email' :  email.toLowerCase() }, function(err, user) {
 				// if there are any errors, return the error
 				if (err) {
-					logger.error('Error while looking up for user ' + email + ': ' + err);
+					logger.error('Error while looking up for user ' + email.toLowerCase() + ': ' + err);
 					return done(err);
 				}
 
 				// check to see if there's already a user with that email
 				if (user) {
-					logger.info('Attempt to re-create user ' + email);
+					logger.info('Attempt to re-create user ' + email.toLowerCase());
 					return done(null, false, req.flash('signupMessage', 'E-mail já cadastrado'));
 				} else {
 
-					logger.debug('Creating user ' + email);
+					logger.debug('Creating user ' + email.toLowerCase());
 					// if there is no user with that email
 					// create the user
 					var newUser      = new User();
 
 					// set the user's local credentials
-					newUser.email    = email;
+					newUser.email    = email.toLowerCase();
 					newUser.password = newUser.generateHash(password);
 					newUser.nome     = req.body.nome;
 					var re = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
@@ -88,12 +88,12 @@ module.exports = function(passport) {
 					// save the user
 					newUser.save(function(err) {
 						if (err) {
-							logger.error('Error while creating user ' + email + ': ' + err);
+							logger.error('Error while creating user ' + email.toLowerCase() + ': ' + err);
 							throw err;
 						}
-						logger.info('Created user ' + email);
+						logger.info('Created user ' + email.toLowerCase());
 						newUser.sendMail(false);
-						return done(null, false, req.flash('validationMessage', 'Um email de confirmação foi enviado para ' + newUser.email));
+						return done(null, false, req.flash('validationMessage', 'Um email de confirmação foi enviado para ' + newUser.email + '. Antes do primeiro login é necessário clicar no link enviado para o seu email'));
 					});
 				}
 
@@ -114,24 +114,29 @@ module.exports = function(passport) {
 
         // find a user whose email is the same as the forms email
         // we are checking to see if the user trying to login already exists
-        User.findOne({ 'email' :  email }, function(err, user) {
+        User.findOne({ 'email' :  email.toLowerCase() }, function(err, user) {
             // if there are any errors, return the error before anything else
             if (err) {
-				logger.error('Error while looking up for user ' + email + ': ' + err);
+				logger.error('Error while looking up for user ' + email.toLowerCase() + ': ' + err);
                 return done(err);
 			}
 
             // if no user is found, return the message
             if (!user) {
-				logger.info('Attempt to log with non-existant user ' + email);
-                return done(null, false, req.flash('loginMessage', 'Usuário ou senha inválidos.')); // req.flash is the way to set flashdata using connect-flash
+				logger.info('Attempt to log with non-existant user ' + email.toLowerCase());
+                return done(null, false, req.flash('loginMessage', 'Email ou senha inválidos.')); // req.flash is the way to set flashdata using connect-flash
 			}
 
+			if (!user.validated) {
+				logger.warn('Attempt to log with user ' + email.toLowerCase() + ' without previous validation');
+                return done(null, false, req.flash('loginMessage', 'Cadastro ainda não foi confirmado através do link enviado para o email ' + email.toLowerCase())); // create the loginMessage and save it to session as flashdata
+			}
+		
 			var loginHistory = new LoginHistory();
 			
             // if the user is found but the password is wrong
             if (!user.validPassword(password)) {
-				logger.warn('Attempt to log with user ' + email + ' with wrong password');
+				logger.warn('Attempt to log with user ' + email.toLowerCase() + ' with wrong password');
 				loginHistory.newLogin(user, false);
                 return done(null, false, req.flash('loginMessage', 'Usuário ou senha inválidos.')); // create the loginMessage and save it to session as flashdata
 			}
@@ -143,12 +148,12 @@ module.exports = function(passport) {
 
 			user.save(function(err) {
 				if (err) {
-					logger.error('Error while saving user ' + email + ': ' + err );
+					logger.error('Error while saving user ' + email.toLowerCase() + ': ' + err );
 					return done(null, false, req.flash('loginMessage', 'Usuário ou senha inválidos.')); // create the loginMessage and save it to session as flashdata
 				}
 			});
 
-			logger.info('New login by user ' + email);
+			logger.info('New login by user ' + email.toLowerCase());
 			loginHistory.newLogin(user, true);
 			
             // all is well, return successful user

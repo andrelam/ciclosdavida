@@ -10,7 +10,7 @@ var { matchedData, sanitize } = require('express-validator/filter');
 
 module.exports = function(app, passport) {
 
-	app.get('/', function(req, res) {
+	app.all('/', function(req, res) {
 		if (req.isAuthenticated()) {
 		// if they aren't redirect them to the home page
 			res.redirect('/mapa');
@@ -24,9 +24,9 @@ module.exports = function(app, passport) {
     // =====================================
     // show the login form
     app.get('/acessar', function(req, res) {
-        // render the page and pass in any flash data if it exists
+		// render the page and pass in any flash data if it exists
 		var dados = { email: '' };
-        res.render('login.ejs', { message: req.flash('loginMessage'), user: req.user, _csrf: req.csrfToken(), dados: dados, errors: [] }); 
+		res.render('login.ejs', { message: req.flash('loginMessage'), user: req.user, _csrf: req.csrfToken(), dados: dados, errors: [] }); 
     });
 
     // process the login form
@@ -36,7 +36,7 @@ module.exports = function(app, passport) {
 	], (req, res, next) => {
 		const errors = validationResult(req);
 		if (!errors.isEmpty()) {
-			var dados = { email: req.body.email };
+			var dados = { email: req.body.email.toLowerCase() };
 			res.render('login.ejs', { message: req.flash('loginMessage'), user: req.user, _csrf: req.csrfToken(), dados: dados, errors: errors.array() });
 			return;
 		}
@@ -70,7 +70,7 @@ module.exports = function(app, passport) {
 		const errors = validationResult(req);
 		if (!errors.isEmpty()) {
 			var dados = { nome: req.body.nome,
-			              email: req.body.email,
+			              email: req.body.email.toLowerCase(),
 						  data: req.body.data };
 			res.render('signup.ejs', { message: req.flash('signupMessage'), _csrf: req.csrfToken(), dados: dados, errors: errors.array() });
 			return;

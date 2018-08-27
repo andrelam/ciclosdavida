@@ -67,19 +67,19 @@ userSchema.methods.sendMail = function(reset) {
 	.then(html => {
 
 		var mailOptions = {
-			to     : user.email,
+			to     : user.email.toLowerCase(),
 			from   : config.nodemailer.defaultFrom,
 			subject: titulo,
 			html   : html
 		};
 		smtp.sendMail(mailOptions, function(err) {
 			if (err)
-				logger.error('US-Error while sending email to ' + user.email + ': ' + err);
+				logger.error('US-Error while sending email to ' + user.email.toLowerCase() + ': ' + err);
 		});
 		return;
 	})
 	.catch(err => {
-		logger.error('US-Error while rendering template ' + template + ' to be sent to user ' + user.email + ': ' + err);
+		logger.error('US-Error while rendering template ' + template + ' to be sent to user ' + user.email.toLowerCase() + ': ' + err);
 	});
 
 	return;
