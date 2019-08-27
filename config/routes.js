@@ -265,6 +265,21 @@ module.exports = function(app, passport) {
 		});
 	});
 
+	app.get('/mensagem', isSuperAdmin, function(req, res) {
+		Notification.find({}).populate('userId').exec(function(err, notifications) {
+			if (err) {
+				logger.error('RGRM-Error while searching notifications: ' + err);
+				req.flash('validationMessage', 'Erro interno ao buscar mensagens');
+				return res.redirect('/mapa');
+			}
+			if (!notifications) {
+				logger.error('RGRM-Not notifications found');
+				req.flash('validationMessage', 'Não há mensagens dos leitores');
+				return res.redirect('/mapa');
+			}
+			res.render('message.ejs', { message: req.flash('messagesMessage'), data: notifications, user: req.user, notification: 0, _csrf: req.csrfToken(), errors: [] });
+		});
+	});
 	
     // =====================================
     // LOGOUT ==============================
