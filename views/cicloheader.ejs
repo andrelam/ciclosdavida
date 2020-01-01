@@ -1,5 +1,6 @@
 <!-- views/header.ejs -->
 <!-- Global site tag (gtag.js) - Google Analytics -->
+<!--
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-40075435-3"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -8,6 +9,23 @@
   gtag('set', {'user_id': '<%= user._id %>'}); // Set the user ID using signed-in user_id.
   gtag('config', 'UA-40075435-3');
 </script>
+-->
+<!-- Matomo -->
+<script type="text/javascript">
+  var _paq = window._paq || [];
+  _paq.push(['setUserId', '<%= user._id %>']);
+  _paq.push(['trackPageView']);
+  _paq.push(['enableLinkTracking']);
+  (function() {
+    var u="https://analytics.coldfire.com.br:8443/";
+    _paq.push(['setTrackerUrl', u+'matomo.php']);
+    _paq.push(['setSiteId', '2']);
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+    g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+  })();
+</script>
+<noscript><img src="https://analytics.coldfire.com.br:8443/matomo.php?idsite=2&amp;rec=1" style="border:0" alt="" /></noscript>
+<!-- End Matomo Code -->
 <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
 	<div class="container-fluid">
 		<div class="navbar-header">
