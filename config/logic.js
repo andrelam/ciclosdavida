@@ -90,10 +90,10 @@ function calculateCycle(difference)
 	// Dia = resto + 1
 	var dia = difference + 1;
 	var diaNoMes = difference + (7 * (semana - 1));
-	
+
 	var diaShabatAnual;
 	var diaRoshHashanah;
-	
+
 	var inicioMes = new Date();
 	inicioMes.setMilliseconds(0);
 	inicioMes.setSeconds(0);
@@ -104,13 +104,13 @@ function calculateCycle(difference)
 	inicioMes.setTime(inicioMes.getTime() + inicioMes.getTimezoneOffset() * 60 * 1000);
 
 	var meses = [];
-	
+
 	for (var m = 0; m <= 6; m++) {
 		var numeroMes = ((mes - 1 + m) % 7) + 1;
 		var nomeMes = formatSefirah(numeroMes - 1);
-		
+
 		var semanas = [];
-		
+
 		for (var w = 0; w <= 6; w++) {
 			var inicioSemana = formatDate(inicioMes);
 			inicioMes.setDate(inicioMes.getDate() + 6);
@@ -138,7 +138,7 @@ function calculateCycle(difference)
 		};
 		meses.push(listaMes);
 	}
-	
+
 	var data = {
 		megaCiclo: megaCiclo,
 		nomeMegaCiclo: formatSefirah(megaCiclo - 1),
@@ -179,7 +179,7 @@ exports.calcula = function (data, nome) {
 
 	var dataNasc = data.match(re);
 	var dataNascStr = dataNasc[2] + '/' + dataNasc[1] + '/' + dataNasc[3];
-	
+
 	var dataNascimento = new Date(dataNascStr);
 	dataNascimento.setTime(dataNascimento.getTime() + dataNascimento.getTimezoneOffset() * 60 * 1000);
 	dataNascimento.setMilliseconds(0);
@@ -188,7 +188,7 @@ exports.calcula = function (data, nome) {
 	dataNascimento.setHours(0);
 
 	var numeroDias = dayDiff(dataNascimento, hoje);
-	
+
 	var data = {
 		nome: nome,
 		aniversario: formatDate(dataNascimento),
@@ -202,7 +202,7 @@ exports.calcula = function (data, nome) {
 	}
 
 	return data;
-	
+
 };
 
 exports.validateDate = function(dateText) {

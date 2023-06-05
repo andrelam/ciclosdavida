@@ -61,7 +61,7 @@ userSchema.methods.sendMail = function(reset) {
 			}
 		}
 	});
-	
+
 	email
 	.render(template, user)
 	.then(html => {
