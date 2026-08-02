@@ -1,7 +1,7 @@
 // models/user.js
 // load the things we need
 var mongoose = require('mongoose');
-var bcrypt   = require('bcrypt-nodejs');
+var bcrypt   = require('bcrypt');
 
 var nodemailer = require('nodemailer');
 var emailTempl = require('email-templates');
@@ -27,7 +27,7 @@ var userSchema = mongoose.Schema( {
 // methods ======================
 // generating a hash
 userSchema.methods.generateHash = function(password) {
-    return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
+    return bcrypt.hashSync(password, bcrypt.genSaltSync(8));
 };
 
 // checking if password is valid

@@ -22,7 +22,7 @@
   "homepage": "https://github.com/andrelam/ciclosdavida#readme",
   "dependencies": {
     "async": "2.6.0",
-    "bcrypt-nodejs": "0.0.3",
+    "bcrypt": "^6.0.0",
     "body-parser": "1.18.2",
     "chai": "3.5.0",
     "compression": "1.7.2",
