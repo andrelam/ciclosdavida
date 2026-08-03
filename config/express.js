@@ -113,8 +113,13 @@ module.exports = function (app, passport, mongoClient) {
     // handle CSRF token errors here
     res.status(403);
     logger.warn('Returning HTTP 403 and redirecting to home page');
-    req.logout();
-    res.redirect('/');
+    req.logout(function(err) {
+        if (err) {
+            return next(err);
+        }
+
+        res.redirect('/');
+    });
   });
 
   // connect flash for flash messages - should be declared after sessions

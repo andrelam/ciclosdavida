@@ -294,9 +294,14 @@ module.exports = function(app, passport) {
     // =====================================
     // LOGOUT ==============================
     // =====================================
-    app.get('/sair', function(req, res) {
-        req.logout();
-        res.redirect('/');
+    app.get('/sair', function(req, res, next) {
+        req.logout(function(err) {
+            if (err) {
+                return next(err);
+            }
+
+            res.redirect('/');
+        });
     });
 
 /*    app.get('/favicon.ico', (req, res) => res.sendStatus(204));  // replaced by serve-favicon */
