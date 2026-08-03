@@ -240,7 +240,7 @@ module.exports = function(app, passport) {
     app.get('/mapa', isLoggedIn, function(req, res) {
         var data = req.user.dNasc.getUTCDate() + "/" + (req.user.dNasc.getUTCMonth()  + 1)+ "/" + req.user.dNasc.getUTCFullYear();
         if (req.user.superUser) {
-            Notification.count({ replied: false }, function(err, conta) {
+            Notification.countDocuments({ replied: false }, function(err, conta) {
                 if (err) {
                     logger.error('RGM-Error while counting notifications: ' + err);
                     res.render('ciclo.ejs', { message: req.flash('validationMessage'), data: logic.calcula(data, req.user.nome), user: req.user, notification: 0, _csrf: req.csrfToken(), errors: [] });
@@ -258,7 +258,7 @@ module.exports = function(app, passport) {
         check('data', 'A data de nascimento deve ser uma data válida').custom((value) => logic.validateDate(value))
     ], (req, res, next) => {
         const errors = validationResult(req);
-        Notification.count({ replied: false }, function(err, conta) {
+        Notification.countDocuments({ replied: false }, function(err, conta) {
             var error = [];
             var data = req.body.data;
             var nome = req.body.nome;

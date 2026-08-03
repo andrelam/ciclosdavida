@@ -39,13 +39,5 @@ notificationSchema.methods.replyNotification = function(user, text) {
 };
 
 
- notificationSchema.statics.countNotifications = function() {
-    this.count({ replied: false }, function(err, conta) {
-        if (err)
-            return (0);
-        return (conta);
-    });
-};
-
 // create the model for Notification and expose it to our app
 module.exports = mongoose.model('Notification', notificationSchema);
