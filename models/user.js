@@ -6,10 +6,8 @@ var bcrypt = require('bcrypt');
 var BCRYPT_ROUNDS = 12;
 
 var nodemailer = require('nodemailer');
-var emailTempl = require('email-templates');
+var ejs        = require('ejs');
 var path       = require('path');
-var templConf  = path.resolve(__dirname, '../views/mail', 'confirm');
-var templReset = path.resolve(__dirname, '../views/mail', 'reset');
 var config     = require('../config/setup.js');
 var logger     = require('../config/logger');
 
@@ -59,18 +57,13 @@ userSchema.methods.sendMail = function(reset) {
 
     var user = this;
 
-    var email = new emailTempl(
-        { views: {
-            root: path.resolve(__dirname, '../views/mail'),
-            options: {
-                extension: 'ejs'
-            }
-        }
-    });
+    var templateFile = path.resolve(__dirname, '../views/mail', template, 'index.ejs');
 
-    email
-    .render(template, user)
-    .then(html => {
+    ejs.renderFile(templateFile, user, function(err, html) {
+        if (err) {
+            logger.error('US-Error while rendering template ' + template + ' to be sent to user ' + user.email.toLowerCase() + ': ' + err);
+            return;
+        }
 
         var mailOptions = {
             to     : user.email.toLowerCase(),
@@ -78,14 +71,11 @@ userSchema.methods.sendMail = function(reset) {
             subject: titulo,
             html   : html
         };
+
         smtp.sendMail(mailOptions, function(err) {
             if (err)
                 logger.error('US-Error while sending email to ' + user.email.toLowerCase() + ': ' + err);
         });
-        return;
-    })
-    .catch(err => {
-        logger.error('US-Error while rendering template ' + template + ' to be sent to user ' + user.email.toLowerCase() + ': ' + err);
     });
 
     return;
