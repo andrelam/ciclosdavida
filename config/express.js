@@ -80,8 +80,8 @@ module.exports = function (app, passport) {
   // CookieParser should be above session
   app.use(cookieParser());
   app.use(session({
-    resave: true,
-    saveUninitialized: true,
+    resave: false,
+    saveUninitialized: false,
     secret: config.secret,
     name: 'sessionId',
 	cookie: { httpOnly: true,
