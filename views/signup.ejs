@@ -4,10 +4,10 @@
 <head>
     <meta name="description" content="Aqui voc&ecirc; pode se cadastrar para acessar o seu Mapa Pessoal conforme explicado no livro Os Ciclos da Vida - A Cabal&aacute; e a Peregrina&ccedil;&atilde;o da Alma - de Jos&eacute; Arnaldo de Castro.">
     <title>Os Ciclos da Vida | Cadastro</title>
-    <% include head.ejs %>
+    <%- include('head.ejs') %>
 </head>
 <body>
-    <% include header.ejs %>
+    <%- include('header.ejs') %>
     <div class="container">
         <div class="col-sm-8 col-sm-offset-2">
             <% if (message.length > 0) { %>
@@ -45,6 +45,6 @@
             <p>Seus dados ser&atilde;o utilizados com o <b>&uacute;nico prop&oacute;sito</b> de permitir o acesso ao seu mapa da vida, e sua senha &eacute; armazenada de forma criptografada.</p>
         </div>
     </div>
-    <% include footer.ejs %>
+    <%- include('footer.ejs') %>
 </body>
 </html>

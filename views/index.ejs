@@ -5,7 +5,7 @@
 <head>
     <meta name="description" content="Os Ciclos da Vida - A Cabal&aacute; e a Peregrina&ccedil;&atilde;o da Alma - &eacute; o novo livro de Jos&eacute; Arnaldo de Castro, e aqui voc&ecirc; pode criar o seu mapa pessoal de seu Ciclo da Vida.">
     <title>Os Ciclos da Vida</title>
-    <% include head.ejs %>
+    <%- include('head.ejs') %>
     <style type="text/css">
         img.ciclos { width: 100%; }
     </style>
@@ -65,7 +65,7 @@
         }]
     }
     </script>
-    <% include header.ejs %>
+    <%- include('header.ejs') %>
     <% if (message.length > 0) { %>
         <div class="alert alert-success alert-dismissible fade-in" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Fechar"><span aria-hidden="true">&times;</span></button><%= message %></div>
     <% } %>
@@ -94,6 +94,6 @@
             </div>
         </div>
     </div>
-    <% include footer.ejs %>
+    <%- include('footer.ejs') %>
 </body>
 </html>

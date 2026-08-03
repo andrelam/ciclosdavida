@@ -4,12 +4,12 @@
 <head>
     <meta name="description" content="Aqui voc&ecirc; tem acesso ao seu Mapa Pessoal conforme explicado no livro Os Ciclos da Vida - A Cabal&aacute; e a Peregrina&ccedil;&atilde;o da Alma - de Jos&eacute; Arnaldo de Castro.">
     <title>Os Ciclos da Vida | Mapa Pessoal</title>
-    <% include head.ejs %>
+    <%- include('head.ejs') %>
     <link rel="stylesheet" href="/print.css" type="text/css" media="print">
     <link rel="stylesheet" href="/graph.css" type="text/css">
 </head>
 <body>
-    <% include cicloheader.ejs %>
+    <%- include('cicloheader.ejs') %>
     <% if (message.length > 0) { %>
         <div class="alert alert-success alert-dismissible fade-in noprint" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Fechar"><span aria-hidden="true">&times;</span></button><%= message %></div>
     <% } %>
@@ -77,7 +77,7 @@
                 <div class="print-only">Em caso de d&uacute;vidas, n&atilde;o hesite em contactar o autor pelo e-mail ciclosdavida@coldfire.com.br, informando seu nome e data de nascimento (dia, m&ecirc;s e ano).</div></h4></div>
             </div>
         </div>
-        <% include footer.ejs %>
+        <%- include('footer.ejs') %>
     </div>
 </body>
 </html>
