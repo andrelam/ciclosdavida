@@ -25,7 +25,7 @@ module.exports = function(app, passport) {
     app.get('/acessar', function(req, res) {
         // render the page and pass in any flash data if it exists
         var dados = { email: '' };
-        res.render('login.ejs', { message: req.flash('loginMessage'), user: req.user, _csrf: req.csrfToken(), dados: dados, errors: [] });
+        res.render('login.ejs', { message: req.flash('loginMessage'), user: req.user, dados: dados, errors: [] });
     });
 
     // process the login form
@@ -36,7 +36,7 @@ module.exports = function(app, passport) {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             var dados = { email: req.body.email.toLowerCase() };
-            res.render('login.ejs', { message: req.flash('loginMessage'), user: req.user, _csrf: req.csrfToken(), dados: dados, errors: errors.array() });
+            res.render('login.ejs', { message: req.flash('loginMessage'), user: req.user, dados: dados, errors: errors.array() });
             return;
         }
         check('email').normalizeEmail();
@@ -55,7 +55,7 @@ module.exports = function(app, passport) {
                       email: '',
                       data: '' };
         // render the page and pass in any flash data if it exists
-        res.render('signup.ejs', { message: req.flash('signupMessage'), _csrf: req.csrfToken(), dados: dados, errors: [] });
+        res.render('signup.ejs', { message: req.flash('signupMessage'), dados: dados, errors: [] });
     });
 
     app.post('/registro', [
@@ -71,7 +71,7 @@ module.exports = function(app, passport) {
             var dados = { nome: req.body.nome,
                           email: req.body.email.toLowerCase(),
                           data: req.body.data };
-            res.render('signup.ejs', { message: req.flash('signupMessage'), _csrf: req.csrfToken(), dados: dados, errors: errors.array() });
+            res.render('signup.ejs', { message: req.flash('signupMessage'), dados: dados, errors: errors.array() });
             return;
         }
         check('email').normalizeEmail();
@@ -86,7 +86,7 @@ module.exports = function(app, passport) {
             res.redirect('/');
         } else {
             if (req.user.validated) {
-                res.render('contact.ejs', { message: req.flash('contactMessage'), user: req.user, _csrf: req.csrfToken() });
+                res.render('contact.ejs', { message: req.flash('contactMessage'), user: req.user });
             } else {
                 logger.info('RGC-User ' + req.user.email + ' is not validated. Redirecting to /.');
                 req.flash('validationMessage', 'Você precisa logar para utilizar esta funcionalidade!');
@@ -105,7 +105,7 @@ module.exports = function(app, passport) {
     });
 
     app.get('/esqueci', function(req, res) {
-        res.render('forgot.ejs', { message: req.flash('forgotMessage'), _csrf: req.csrfToken(), errors: [], email: '' });
+        res.render('forgot.ejs', { message: req.flash('forgotMessage'), errors: [], email: '' });
     });
 
     app.post('/esqueci', [
@@ -113,7 +113,7 @@ module.exports = function(app, passport) {
     ], (req, res, next) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            res.render('forgot.ejs', { message: req.flash('forgotMessage'), _csrf: req.csrfToken(), errors: errors.array(), email: req.body.email });
+            res.render('forgot.ejs', { message: req.flash('forgotMessage'), errors: errors.array(), email: req.body.email });
             return;
         }
         check('email').normalizeEmail();
@@ -163,7 +163,7 @@ module.exports = function(app, passport) {
                     req.flash('validationMessage', 'Token para reset da senha expirado');
                     return res.redirect('/');
                 }
-                res.render('reset.ejs', { message: req.flash('validationMessage'), token: user.resetToken, _csrf: req.csrfToken(), errors: [] });
+                res.render('reset.ejs', { message: req.flash('validationMessage'), token: user.resetToken, errors: [] });
             } else { // New user
                 user.resetToken = undefined;
                 user.resetValid = undefined;
@@ -189,7 +189,7 @@ module.exports = function(app, passport) {
 
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            res.render('reset.ejs', { message: req.flash('validationMessage'), token: req.params.token, _csrf: req.csrfToken(), errors: errors.array() });
+            res.render('reset.ejs', { message: req.flash('validationMessage'), token: req.params.token, errors: errors.array() });
             return;
         }
         User.findOne({ resetToken: req.params.token, resetValid: { $gt: Date.now() } }, function(err, user) {
@@ -242,13 +242,13 @@ module.exports = function(app, passport) {
             Notification.countDocuments({ replied: false }, function(err, conta) {
                 if (err) {
                     logger.error('RGM-Error while counting notifications: ' + err);
-                    res.render('ciclo.ejs', { message: req.flash('validationMessage'), data: logic.calcula(data, req.user.nome), user: req.user, notification: 0, _csrf: req.csrfToken(), errors: [] });
+                    res.render('ciclo.ejs', { message: req.flash('validationMessage'), data: logic.calcula(data, req.user.nome), user: req.user, notification: 0, errors: [] });
                 } else {
-                    res.render('ciclo.ejs', { message: req.flash('validationMessage'), data: logic.calcula(data, req.user.nome), user: req.user, notification: conta, _csrf: req.csrfToken(), errors: [] });
+                    res.render('ciclo.ejs', { message: req.flash('validationMessage'), data: logic.calcula(data, req.user.nome), user: req.user, notification: conta, errors: [] });
                 }
             });
         } else {
-            res.render('ciclo.ejs', { message: req.flash('validationMessage'), data: logic.calcula(data, req.user.nome), user: req.user, notification: 0, _csrf: req.csrfToken(), errors: [] });
+            res.render('ciclo.ejs', { message: req.flash('validationMessage'), data: logic.calcula(data, req.user.nome), user: req.user, notification: 0, errors: [] });
         }
     });
 
@@ -270,7 +270,7 @@ module.exports = function(app, passport) {
                 logger.error('RGM-Error while counting notifications: ' + err);
                 conta = 0;
             };
-            res.render('ciclo.ejs', { message: req.flash('validationMessage'), data: logic.calcula(data, nome), user: req.user, notification: conta, _csrf: req.csrfToken(), errors: error });
+            res.render('ciclo.ejs', { message: req.flash('validationMessage'), data: logic.calcula(data, nome), user: req.user, notification: conta, errors: error });
         });
     });
 
@@ -286,7 +286,7 @@ module.exports = function(app, passport) {
                 req.flash('validationMessage', 'Não há mensagens dos leitores');
                 return res.redirect('/mapa');
             }
-            res.render('message.ejs', { message: req.flash('messagesMessage'), data: notifications, user: req.user, notification: 0, _csrf: req.csrfToken(), errors: [] });
+            res.render('message.ejs', { message: req.flash('messagesMessage'), data: notifications, user: req.user, notification: 0, errors: [] });
         });
     });
 

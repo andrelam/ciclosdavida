@@ -19,7 +19,6 @@
             <h1>Redefina a sua senha</h1>
             <p>Informe abaixo a sua nova senha:</p>
             <form action="/redefinir/<%= token %>" method="post">
-                <input type="hidden" name="_csrf" value="<%= _csrf %>">
                 <div class="form-group">
                     <label>Senha</label>
                     <input type="password" class="form-control" name="password" placeholder="Informe uma senha">

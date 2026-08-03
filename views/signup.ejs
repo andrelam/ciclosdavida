@@ -19,7 +19,6 @@
             <h1>Fa&ccedil;a seu cadastro!</h1>
             <p>Informe os dados abaixo corretamente para obter acesso ao seu mapa dos Ciclos da Vida.</p>
             <form action="/registro" method="post">
-                <input type="hidden" name="_csrf" value="<%= _csrf %>">
                 <div class="form-group">
                     <label>Nome Completo</label>
                     <input type="text" class="form-control" name="nome" placeholder="Informe seu nome completo" value="<%= dados.nome %>">

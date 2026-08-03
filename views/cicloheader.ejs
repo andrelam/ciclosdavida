@@ -39,7 +39,6 @@
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <% if (user.superUser) { %>
                 <form class="navbar-form navbar-left" action="/mapa" method="post">
-                    <input type="hidden" name="_csrf" value="<%= _csrf %>">
                     <div class="form-group">
                         <label>Nome</label>
                         <input type="text" class="form-control" name="nome" placeholder="Nome completo">

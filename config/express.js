@@ -2,7 +2,6 @@ var path = require('path');
 var express = require('express');
 var session = require('express-session');
 var MongoStore = require('connect-mongo').MongoStore;
-var csrf = require('csurf');
 var compression = require('compression');
 var cookieParser = require('cookie-parser');
 var methodOverride = require('method-override');
@@ -97,12 +96,6 @@ module.exports = function (app, passport, mongoClient) {
     }
   }));
 
-  app.use(csrf());
-
-  app.use(function(req, res, next) {
-      res.cookie("XSRF-TOKEN", req.csrfToken());
-      return next();
-  });
 
   // error handler
   app.use(function (err, req, res, next) {
