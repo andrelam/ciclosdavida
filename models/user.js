@@ -1,7 +1,9 @@
 // models/user.js
 // load the things we need
 var mongoose = require('mongoose');
-var bcrypt   = require('bcrypt');
+var bcrypt = require('bcrypt');
+
+var BCRYPT_ROUNDS = 12;
 
 var nodemailer = require('nodemailer');
 var emailTempl = require('email-templates');
@@ -27,12 +29,16 @@ var userSchema = mongoose.Schema( {
 // methods ======================
 // generating a hash
 userSchema.methods.generateHash = function(password) {
-    return bcrypt.hashSync(password, bcrypt.genSaltSync(8));
+    return bcrypt.hash(password, BCRYPT_ROUNDS);
 };
 
 // checking if password is valid
 userSchema.methods.validPassword = function(password) {
-    return bcrypt.compareSync(password, this.password);
+    return bcrypt.compare(password, this.password);
+};
+
+userSchema.methods.passwordNeedsRehash = function() {
+    return bcrypt.getRounds(this.password) < BCRYPT_ROUNDS;
 };
 
 userSchema.methods.sendMail = function(reset) {

@@ -71,7 +71,6 @@ module.exports = function(passport) {
 
 					// set the user's local credentials
 					newUser.email    = email.toLowerCase();
-					newUser.password = newUser.generateHash(password);
 					newUser.nome     = req.body.nome;
 					var re = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
 
@@ -85,8 +84,13 @@ module.exports = function(passport) {
 					newUser.premium    = false;
 					newUser.superUser  = false;
 					
-					// save the user
-					newUser.save(function(err) {
+					// generate password hash before saving the user
+					newUser.generateHash(password)
+					.then(function(hash) {
+						newUser.password = hash;
+
+						// save the user
+						newUser.save(function(err) {
 						if (err) {
 							logger.error('Error while creating user ' + email.toLowerCase() + ': ' + err);
 							throw err;
@@ -94,6 +98,11 @@ module.exports = function(passport) {
 						logger.info('Created user ' + email.toLowerCase());
 						newUser.sendMail(false);
 						return done(null, false, req.flash('validationMessage', 'Um email de confirmação foi enviado para ' + newUser.email + '. Antes do primeiro login é necessário clicar no link enviado para o seu email'));
+						});
+					})
+					.catch(function(err) {
+						logger.error('Error while hashing password for user ' + email.toLowerCase() + ': ' + err);
+						return done(err);
 					});
 				}
 
@@ -134,12 +143,26 @@ module.exports = function(passport) {
 		
 			var loginHistory = new LoginHistory();
 			
-            // if the user is found but the password is wrong
-            if (!user.validPassword(password)) {
-				logger.warn('Attempt to log with user ' + email.toLowerCase() + ' with wrong password');
-				loginHistory.newLogin(user, false);
-                return done(null, false, req.flash('loginMessage', 'Usuário ou senha inválidos.')); // create the loginMessage and save it to session as flashdata
-			}
+            // check if the password is valid
+            user.validPassword(password)
+            .then(function(passwordIsValid) {
+                    if (!passwordIsValid) {
+                            logger.warn('Attempt to log with user ' + email.toLowerCase() + ' with wrong password');
+                            loginHistory.newLogin(user, false);
+                            done(null, false, req.flash('loginMessage', 'Usuário ou senha inválidos.'));
+                            return Promise.reject({ authenticationFailed: true });
+                    }
+
+                    if (user.passwordNeedsRehash()) {
+                            return user.generateHash(password);
+                    }
+
+                    return null;
+            })
+            .then(function(newPasswordHash) {
+                    if (newPasswordHash) {
+                            user.password = newPasswordHash;
+                    }
 
 			// update last login data
 			user.resetToken = undefined;
@@ -158,6 +181,15 @@ module.exports = function(passport) {
 			
             // all is well, return successful user
             return done(null, user);
+            })
+            .catch(function(err) {
+                    if (err && err.authenticationFailed) {
+                            return;
+                    }
+
+                    logger.error('Error while validating password for user ' + email.toLowerCase() + ': ' + err);
+                    return done(err);
+            });
         });
 
     }));

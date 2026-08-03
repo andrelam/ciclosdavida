@@ -209,21 +209,31 @@ module.exports = function(app, passport) {
 				req.flash('validationMessage', 'Reset da senha para novo usuário não permitido');
 				return res.redirect('/');
 			}
-            user.password = user.generateHash(req.body.password);
-			user.resetToken = undefined;
-			user.resetValid = undefined;
-			user.validated  = false;
-			user.save(function(err) {
-				if (err) {
-					logger.error('RPRT-Error while saving user ' + user.email + ': ' + err);
-					req.flash('validationMessage', 'Erro interno ao validar token. Favor entrar em contato com ciclosdavida@coldfire.com.br');
-					return res.redirect('/');
-				}
-				user.sendMail(false);
-				logger.info('RPR-Password reset for user ' + user.email);
-				req.flash('validationMessage', 'Senha resetada. Um email de confirmação foi enviado.');
-				return res.redirect('/');
-			});
+            user.generateHash(req.body.password)
+            .then(function(hash) {
+                    user.password = hash;
+					user.resetToken = undefined;
+					user.resetValid = undefined;
+					user.validated  = false;
+
+					user.save(function(err) {
+						if (err) {
+							logger.error('RPRT-Error while saving user ' + user.email + ': ' + err);
+							req.flash('validationMessage', 'Erro interno ao validar token. Favor entrar em contato com ciclosdavida@coldfire.com.br');
+							return res.redirect('/');
+						}
+
+						user.sendMail(false);
+						logger.info('RPR-Password reset for user ' + user.email);
+						req.flash('validationMessage', 'Senha resetada. Um email de confirmação foi enviado.');
+						return res.redirect('/');
+					});
+            })
+            .catch(function(err) {
+                    logger.error('RPRT-Error while hashing password for user ' + user.email + ': ' + err);
+                    req.flash('validationMessage', 'Erro interno ao redefinir senha.');
+                    return res.redirect('/');
+            });
 		});
 	});
 
