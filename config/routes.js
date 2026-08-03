@@ -5,8 +5,7 @@ var User         = require('../models/user');
 var Notification = require('../models/notification');
 var crypto       = require('crypto');
 var logger       = require('./logger');
-var { check, validationResult } = require('express-validator/check');
-var { matchedData, sanitize } = require('express-validator/filter');
+var { check, validationResult } = require('express-validator');
 
 module.exports = function(app, passport) {
 
