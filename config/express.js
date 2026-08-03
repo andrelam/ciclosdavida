@@ -22,7 +22,7 @@ const env   = process.env.NODE_ENV || 'development';
  * Expose
  */
 
-module.exports = function (app, passport) {
+module.exports = function (app, passport, mongoClient) {
 
   app.set('trust proxy', 1);
 
@@ -86,7 +86,7 @@ module.exports = function (app, passport) {
     secret: config.secret,
     name: 'sessionId',
     store: MongoStore.create({
-      mongoUrl: config.dbUrl,
+      client: mongoClient,
       collectionName: 'sessions',
       ttl: 14 * 24 * 60 * 60
     }),
