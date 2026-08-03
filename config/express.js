@@ -4,7 +4,6 @@ var session = require('express-session');
 var csrf = require('csurf');
 var compression = require('compression');
 var cookieParser = require('cookie-parser');
-var cookieSession = require('cookie-session');
 var bodyParser = require('body-parser');
 var methodOverride = require('method-override');
 var morgan = require('morgan');
@@ -23,6 +22,8 @@ const env   = process.env.NODE_ENV || 'development';
  */
 
 module.exports = function (app, passport) {
+
+  app.set('trust proxy', 1);
 
   app.use(helmet());
 
@@ -78,7 +79,6 @@ module.exports = function (app, passport) {
 
   // CookieParser should be above session
   app.use(cookieParser());
-  app.use(cookieSession({ secret: config.secret }));
   app.use(session({
     resave: true,
     saveUninitialized: true,
