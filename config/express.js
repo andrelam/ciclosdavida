@@ -96,25 +96,6 @@ module.exports = function (app, passport, mongoClient) {
     }
   }));
 
-
-  // error handler
-  app.use(function (err, req, res, next) {
-    if (err.code !== 'EBADCSRFTOKEN')
-        return next(err);
-
-    logger.error('CSRF attempt detected: ' + err);
-    // handle CSRF token errors here
-    res.status(403);
-    logger.warn('Returning HTTP 403 and redirecting to home page');
-    req.logout(function(err) {
-        if (err) {
-            return next(err);
-        }
-
-        res.redirect('/');
-    });
-  });
-
   // connect flash for flash messages - should be declared after sessions
   app.use(flash());
 

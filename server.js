@@ -51,6 +51,21 @@ function startApplication() {
         // routes
         require('./config/routes.js')(app, passport);
 
+        // CSRF error handler
+        app.use(function (err, req, res, next) {
+            if (!err || err.message !== 'invalid csrf token')
+                return next(err);
+
+            logger.error('CSRF attempt detected: ' + err);
+            logger.warn('Returning HTTP 403 and redirecting to home page');
+
+            var flashMessage = 'Sua sessão expirou ou a solicitação foi considerada inválida. Tente novamente.';
+            req.flash('validationMessage', flashMessage);
+
+            res.status(403);
+            res.redirect('/');
+        });
+
         app.listen(port);
         logger.info('Express app started on port ' + port);
     })
