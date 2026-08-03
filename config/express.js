@@ -1,6 +1,7 @@
 var path = require('path');
 var express = require('express');
 var session = require('express-session');
+var MongoStore = require('connect-mongo').MongoStore;
 var csrf = require('csurf');
 var compression = require('compression');
 var cookieParser = require('cookie-parser');
@@ -84,8 +85,17 @@ module.exports = function (app, passport) {
     saveUninitialized: false,
     secret: config.secret,
     name: 'sessionId',
-	cookie: { httpOnly: true,
-              secure: true }
+    store: MongoStore.create({
+      mongoUrl: config.dbUrl,
+      collectionName: 'sessions',
+      ttl: 14 * 24 * 60 * 60
+    }),
+    cookie: {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'lax',
+      maxAge: 14 * 24 * 60 * 60 * 1000
+    }
   }));
 
   app.use(csrf());
