@@ -14,16 +14,16 @@ var config     = require('../config/setup.js');
 var logger     = require('../config/logger');
 
 var userSchema = mongoose.Schema( {
-	email     : { type: String, required: true, unique: true, trim: true },
-	password  : { type: String, required: true },
-	nome      : { type: String, required: true, trim: true },
-	dNasc     : { type: Date, required: true },
-	resetToken: { type: String, required: false },
-	resetValid: { type: Date, required: false },
-	validated : { type: Boolean, default: false },
-	premium   : { type: Boolean, default: false },
-	superUser : { type: Boolean, default: false },
-	lastLogin : { type: Date, required: false }
+    email     : { type: String, required: true, unique: true, trim: true },
+    password  : { type: String, required: true },
+    nome      : { type: String, required: true, trim: true },
+    dNasc     : { type: Date, required: true },
+    resetToken: { type: String, required: false },
+    resetValid: { type: Date, required: false },
+    validated : { type: Boolean, default: false },
+    premium   : { type: Boolean, default: false },
+    superUser : { type: Boolean, default: false },
+    lastLogin : { type: Date, required: false }
 });
 
 // methods ======================
@@ -42,53 +42,53 @@ userSchema.methods.passwordNeedsRehash = function() {
 };
 
 userSchema.methods.sendMail = function(reset) {
-	var smtp = nodemailer.createTransport(config.nodemailer.transport);
+    var smtp = nodemailer.createTransport(config.nodemailer.transport);
 
-	var template;
-	var titulo;
+    var template;
+    var titulo;
 
-	if (reset) {
-		template = 'reset';
-		titulo = 'Reinicialize sua senha';
-	} else {
-		template = 'confirm';
-		titulo = 'Confirme seu registro';
-	};
+    if (reset) {
+        template = 'reset';
+        titulo = 'Reinicialize sua senha';
+    } else {
+        template = 'confirm';
+        titulo = 'Confirme seu registro';
+    };
 
-	var html;
+    var html;
 
-	var user = this;
+    var user = this;
 
-	var email = new emailTempl( 
-		{ views: {
-			root: path.resolve(__dirname, '../views/mail'),
-			options: {
-				extension: 'ejs'
-			}
-		}
-	});
+    var email = new emailTempl(
+        { views: {
+            root: path.resolve(__dirname, '../views/mail'),
+            options: {
+                extension: 'ejs'
+            }
+        }
+    });
 
-	email
-	.render(template, user)
-	.then(html => {
+    email
+    .render(template, user)
+    .then(html => {
 
-		var mailOptions = {
-			to     : user.email.toLowerCase(),
-			from   : config.nodemailer.defaultFrom,
-			subject: titulo,
-			html   : html
-		};
-		smtp.sendMail(mailOptions, function(err) {
-			if (err)
-				logger.error('US-Error while sending email to ' + user.email.toLowerCase() + ': ' + err);
-		});
-		return;
-	})
-	.catch(err => {
-		logger.error('US-Error while rendering template ' + template + ' to be sent to user ' + user.email.toLowerCase() + ': ' + err);
-	});
+        var mailOptions = {
+            to     : user.email.toLowerCase(),
+            from   : config.nodemailer.defaultFrom,
+            subject: titulo,
+            html   : html
+        };
+        smtp.sendMail(mailOptions, function(err) {
+            if (err)
+                logger.error('US-Error while sending email to ' + user.email.toLowerCase() + ': ' + err);
+        });
+        return;
+    })
+    .catch(err => {
+        logger.error('US-Error while rendering template ' + template + ' to be sent to user ' + user.email.toLowerCase() + ': ' + err);
+    });
 
-	return;
+    return;
 };
 
 // create the model for users and expose it to our app

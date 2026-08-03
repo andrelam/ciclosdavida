@@ -22,25 +22,25 @@ var port = process.env.PORT || 2000;
 mongoose.Promise = global.Promise;
 mongoose.connect(config.dbUrl)
 .then(() => {
-	logger.info('MongoDB connected');
+    logger.info('MongoDB connected');
 }).catch((err) => {
-	logger.error('MongoDB could not connect: ' + err);
+    logger.error('MongoDB could not connect: ' + err);
 }); // connect to our database
 
 var db = mongoose.connection;
 
 const connectWithRetry = () => {
-	logger.info('MongoDB connection with retry');
-	return mongoose.connect(config.dbUrl);
+    logger.info('MongoDB connection with retry');
+    return mongoose.connect(config.dbUrl);
 };
 
 db.on('error', err => {
-	logger.error('MongoDB could not connect: ' + err);
-	setTimeout(connectWithRetry, 1000);
+    logger.error('MongoDB could not connect: ' + err);
+    setTimeout(connectWithRetry, 1000);
 });
 
 db.on('connected', () => {
-	logger.info('MongoDB connected');
+    logger.info('MongoDB connected');
 });
 
 //mercadopago.configure(config.mercadopago);

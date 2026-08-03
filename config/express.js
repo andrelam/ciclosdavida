@@ -37,7 +37,7 @@ module.exports = function (app, passport) {
   app.use(express.static(path.join(__dirname, '/../public'))); //Expose /public
 
   app.use(favicon(path.join(__dirname, '/../public', 'favicon.ico')));
-  
+
   // Use winston on production
   var log = config.logging.format || 'dev';
 
@@ -101,21 +101,21 @@ module.exports = function (app, passport) {
   app.use(csrf());
 
   app.use(function(req, res, next) {
-	  res.cookie("XSRF-TOKEN", req.csrfToken());
-	  return next();
+      res.cookie("XSRF-TOKEN", req.csrfToken());
+      return next();
   });
 
   // error handler
   app.use(function (err, req, res, next) {
     if (err.code !== 'EBADCSRFTOKEN')
-		return next(err);
+        return next(err);
 
-	logger.error('CSRF attempt detected: ' + err);
+    logger.error('CSRF attempt detected: ' + err);
     // handle CSRF token errors here
     res.status(403);
-	logger.warn('Returning HTTP 403 and redirecting to home page');
-	req.logout();
-	res.redirect('/');
+    logger.warn('Returning HTTP 403 and redirecting to home page');
+    req.logout();
+    res.redirect('/');
   });
 
   // connect flash for flash messages - should be declared after sessions
